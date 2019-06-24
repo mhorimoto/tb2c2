@@ -1,5 +1,9 @@
 #! /usr/bin/python3
 #coding: utf-8
+#
+#  Version 1.01
+#
+import os
 import signal
 import lcd_i2c as lcd
 import datetime
@@ -48,12 +52,46 @@ prevsec = 0
 ip = HOST
 
 #
+#  D2,D3 initialize
+#
+GPIO="/sys/class/gpio"
+GPIOEXPORT=GPIO+"/export"
+GPIO10="/sys/class/gpio/gpio10"
+GPIO20="/sys/class/gpio/gpio20"
+
+DOUT = open(GPIOEXPORT,"w")
+if os.path.isdir(GPIO10):
+    pass
+else:
+    DOUT.write("10")
+    DOUT.flush()
+if os.path.isdir(GPIO20):
+    pass
+else:
+    DOUT.write("20")
+    DOUT.flush()
+DOUT.close()
+
+DOUT = open(GPIO10+"/direction","w")
+DOUT.write("out")
+DOUT.close()
+DOUT = open(GPIO20+"/direction","w")
+DOUT.write("out")
+DOUT.close()
+
+D2 = open(GPIO10+"/value","w")
+D3 = open(GPIO20+"/value","w")
+
+#
 #  TB2 port initialize
 #
 try:
     tb2 = serial.Serial('/dev/ttyS1',19200,timeout=0.1)
 except serial.serialutil.SerialException:
     print("NO SERIAL ttyS1 for TB2")
+    lcd.lcd_string("NO ttyS1 for TB2",lcd.LCD_LINE_1)
+    D2.write("1")
+    D2.flush()
     tb2 = False
     tb2initok = False
 
@@ -64,52 +102,63 @@ wd3 = wd3init()
     
 while(True):
     a=datetime.datetime.now()
-    d="{0:2d}{1:02d}{2:02d}".format(a.year-2000,a.month,a.day)
-    t=int("{0:2d}{1:02d}{2:02d}".format(a.hour,a.minute,a.second))
-    s="{0:6s} {1:6d}".format(d,t)
     if (prevsec > a.second):
         ##################################################################
         #
         # Read data from TB2
         #
         if tb2initok:
+            D2.write("1")
+            D2.flush()
             for i in range(20):
-                print("IN FOR")
                 tb2.write("a".encode())
                 time.sleep(0.05)  # Wait for 50mSec
                 ans = tb2.readline().decode()
                 if ans != "":
                     tb2ok = True
+                    D2.write("0")
+                    D2.flush()
                     break         # exit for-loop
                 else:
                     tb2ok = False
-            print("EXIT FOR")
             if tb2ok:
                 try:
                     f_ans = float(ans)
                     i_tb2v = int(f_ans * 10)
-                    print("TB2 VAL={0}".format(f_ans))
+                    #print("TB2 VAL={0}".format(f_ans))
                 except ValueError:
                     print("TB2 Value error")
+                    lcd.lcd_string("TB2 Value error",lcd.LCD_LINE_1)
+                    D2.write("1")
+                    D2.flush()
         else:
             print("tb2init NG")
-            pass
-
+            lcd.lcd_string("tb2init NG",lcd.LCD_LINE_1)
+            D2.write("1")
+            D2.flush()
         #
         # Read data from WD-3
         #
-        print("ENTER WD3")
         if wd3initok:
+            D2.write("1")
+            D2.flush()
             wd3.write("D".encode())
             ans = wd3.readline().decode()
             chkans = ans[0:2]
             if chkans=='DW':
                 wd3ok = True
+                D2.write("0")
+                D2.flush()
             else:
                 wd3ok = False
                 print(chkans)
-
+                emsg = "WD3init ERR {0}".format(chkans)
+                lcd.lcd_string(emsg,lcd.LCD_LINE_1)
+                D2.write("1")
+                D2.flush()
             if wd3ok:
+                D2.write("0")
+                D2.flush()
                 # DW=1.000,E=0.009,T=0.482E1 <== Responsed TEXT
 
                 #
@@ -138,26 +187,31 @@ while(True):
                 i_tp = 990
                 i_ec = 9999
         else:
-            print("WD3 ERROR")
-            #i_vwc = -99
-            #i_tp = 998
-            #i_ec = 9998
+            D2.write("1")
+            D2.flush()
+            emsg = "WD3 ERROR"
+            print(emsg)
+            lcd.lcd_string(emsg,lcd.LCD_LINE_1)
 
+        D3.write("1")
+        D3.flush()
         send_UECSdata("FLOW.mNB",i_tb2v,HOST)
         send_UECSdata("VWC.mNB",i_vwc,HOST)
         send_UECSdata("EC.mNB",i_ec,HOST)
         send_UECSdata("TEMP.mNB",i_tp,HOST)
+        D3.write("0")
+        D3.flush()
 
 #######################################################        
     if (a.second>50):
         lcd.lcd_string(ip,lcd.LCD_LINE_2)
     elif (a.second>40):
-        msg = "UECS TB2C2 V1.0"
+        msg = "UECS TB2C2 V1.01"
         lcd.lcd_string(msg,lcd.LCD_LINE_2)
     elif (a.second>30):
         lcd.lcd_string(ip,lcd.LCD_LINE_2)
     elif (a.second>20):
-        msg = "UECS TB2C2 V1.0"
+        msg = "UECS TB2C2 V1.01"
         lcd.lcd_string(msg,lcd.LCD_LINE_2)
     elif (a.second>10):
         lcd.lcd_string(ip,lcd.LCD_LINE_2)
