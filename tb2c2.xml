@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<UECS>
+  <CCM cast="1" unit="L" SR="S" LV="A-1M-0" exp="排液量" detail="">FLOW.mNB</CCM>
+  <CCM cast="1" unit="%" SR="S" LV="A-1M-0" exp="VWC" detail="体積含水率">VWC.mNB</CCM>
+  <CCM cast="2" unit="mS/cm" SR="S" LV="A-1M-0" exp="EC" detail="電気伝導度">EC.mNB</CCM>
+  <CCM cast="1" unit="C" SR="S" LV="A-1M-0" exp="水温" detail="排液水温">TEMP.mNB</CCM>
+  <CCM cast="0" unit="" SR="S" LV="A-1S-0" exp="機器動作状態" detail="" >cnd.mNB</CCM>
+</UECS>

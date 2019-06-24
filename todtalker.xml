@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<UECS>
-  <CCM cast="0" unit="" SR="S" LV="A-1M-0" exp="日付" detail="日付" >Date</CCM>
-  <CCM cast="0" unit="" SR="S" LV="A-1M-0" exp="時刻" detail="日本標準時" >Time</CCM>
-  <CCM cast="0" unit="" SR="S" LV="A-1S-0" exp="機器動作状態" detail="" >cnd.mXX</CCM>
-</UECS>

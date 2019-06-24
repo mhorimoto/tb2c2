@@ -1,9 +1,9 @@
 [Unit]
-Description = UECS TOD Talker
+Description = UECS TB2 Talker
 After = rc-local.service
 
 [Service]
-ExecStart = /usr/local/bin/todtalkerd.py
+ExecStart = /usr/local/bin/tb2c2d.py
 Restart = always
 Type = simple
 

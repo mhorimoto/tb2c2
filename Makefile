@@ -1,14 +1,14 @@
-EXECP=/usr/local/bin/todtalkerd.py
+EXECP=/usr/local/bin/tb2c2d.py
 SCANP=/usr/local/bin/scanresponse.py
-SYSCD=/etc/systemd/system/todtalker.service
+SYSCD=/etc/systemd/system/tb2c2.service
 SCAND=/etc/systemd/system/scanresponse.service
 TARGD=/usr/local/bin
 CFGFD=/etc/uecs
 NTPDC=/etc/ntp.conf
 CONFF=$(CFGFD)/config.ini
-XMLFF=$(CFGFD)/todtalker.xml
+XMLFF=$(CFGFD)/tb2c2.xml
 
-$(EXECP): todtalkerd.py
+$(EXECP): tb2c2d.py
 	install $^ $(TARGD)
 
 $(SCANP): scanresponse.py
@@ -17,10 +17,10 @@ $(SCANP): scanresponse.py
 $(CONFF): config.ini
 	cp $^ $(CONFF)
 
-$(XMLFF): todtalker.xml
+$(XMLFF): tb2c2.xml
 	cp $^ $(XMLFF)
 
-$(SYSCD): todtalker.service
+$(SYSCD): tb2c2.service
 	cp $^ $(SYSCD)
 
 $(SCAND): scanresponse.service

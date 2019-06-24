@@ -1,6 +1,6 @@
-# UECS TOD Talker Daemon
+# UECS TB2C2 Talker Daemon
 
-UECSインタフェースを使ってDate/Timeを送出するデーモン
+UECSインタフェースを使って排液量データを送出するデーモン
 
 
 Version 0.01  
@@ -15,15 +15,18 @@ Python3で動作する。
  * import time
  * import configparser
  * import netifaces
+ * import smbus
  * from socket import *
 
 ## CCM
 
     <?xml version="1.0" encoding="UTF-8"?>
     <UECS>
-      <CCM cast="0" unit="" SR="S" LV="A-1M-0" exp="日付" detail="日付">Date</CCM>
-      <CCM cast="0" unit="" SR="S" LV="A-1M-0" exp="時刻" detail="日本標準時">Time</CCM>
-      <CCM cast="0" unit="" SR="S" LV="A-1S-0" exp="機器動作状態" detail="">cnd.mXX</CCM>
+      <CCM cast="1" unit="L" SR="S" LV="A-1M-0" exp="排液量" detail="">FLOW.mNB</CCM>
+      <CCM cast="1" unit="%" SR="S" LV="A-1M-0" exp="VWC" detail="体積含水率">VWC.mNB</CCM>
+      <CCM cast="2" unit="mS/cm" SR="S" LV="A-1M-0" exp="EC" detail="電気伝導度">EC.mNB</CCM>
+      <CCM cast="1" unit="C" SR="S" LV="A-1M-0" exp="水温" detail="排液水温">TEMP.mNB</CCM>
+      <CCM cast="0" unit="" SR="S" LV="A-1S-0" exp="機器動作状態" detail="" >cnd.mNB</CCM>
     </UECS>
 
 
@@ -34,24 +37,36 @@ Python3で動作する。
 config.iniを変更することで、room,region,order,priorityの設定を変更することが出来る。
 
     [NODE]
-    name = TODTALKER
+    name = TB2C2
     vender = HOLLY
-    uecsid = 10100C000001
-    xmlfile = /etc/uecs/todtalker.xml
+    uecsid = 10100C000002
+    xmlfile = /etc/uecs/tb2c2.xml
     
-    [Date]
+    [FLOW.mNB]
     room = 0
     region = 0
     order = 0
     priority = 1
     
-    [Time]
+    [VWC.mNB]
     room = 0
     region = 0
     order = 0
     priority = 1
     
-    [cnd.mXX]
+    [EC.mNB]
+    room = 0
+    region = 0
+    order = 0
+    priority = 1
+    
+    [TEMP.mNB]
+    room = 0
+    region = 0
+    order = 0
+    priority = 1
+    
+    [cnd.mNB]
     room = 0
     region = 0
     order = 0
@@ -66,8 +81,8 @@ config.iniを変更することで、room,region,order,priorityの設定を変�
 
 ### 起動の方法
 
-    systemctl enable todtalker
+    systemctl enable tb2c2
     systemctl enable scanresponse
-    systemctl start todtalker
+    systemctl start tb2c2
     systemctl start scanresponse
     

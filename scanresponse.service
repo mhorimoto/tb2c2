@@ -1,5 +1,5 @@
 [Unit]
-Description = UECS TOD Talker Scanresponse
+Description = UECS Scanresponse
 After = rc-local.service
 
 [Service]
