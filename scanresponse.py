@@ -39,7 +39,7 @@ class ServerThread(threading.Thread):
 
     def send_cnd(self):
         ccm = ET.parse(config['NODE']['xmlfile'])
-        self.sdata = "{0}{1}<DATA type=\"cnd.mXX\" root=\"0\" region=\"0\" order=\"0\" priority=\"29\">"\
+        self.sdata = "{0}{1}<DATA type=\"cnd.mXX\" room=\"0\" region=\"0\" order=\"0\" priority=\"29\">"\
                      "0</DATA><IP>{2}</IP></UECS>".\
                      format(XML_HEADER,UECS_HEADER,self.ipaddress)
         self.broadaddress = (ADDRESS,PORT)
