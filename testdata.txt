@@ -4,3 +4,9 @@ Sender
 nc -u -b 192.168.31.255 16529
 <?xml version="1.0"?><UECS ver="1.00-E10"><CCMSCAN page="1"/></UECS>
 <?xml version="1.0"?><UECS ver="1.00-E10"><NODESCAN/></UECS>
+
+
+monitoring script
+
+sudo tcpdump -A -B480  udp port 16520 or 16529 | grep --line-buffered xml | sed -r "s/(.*)<\?xml version=\"1.0\"\?><UECS ver=\"1.00-E10\"><DATA type=\"//;s/\" room=\"/,/;s/\" region=\"/,/;s/\" order=\"/,/;s/\" priority=\"/,/;s/\">/,/;s/<\/DATA><IP>/,/;s/<\/IP><\/UECS>//"
+
