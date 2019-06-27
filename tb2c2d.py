@@ -127,6 +127,8 @@ while(True):
                     i_tb2v = int(f_ans * 10)
                     #print("TB2 VAL={0}".format(f_ans))
                 except ValueError:
+                    f_ans = 0.0
+                    i_tb2v = 0
                     print("TB2 Value error")
                     lcd.lcd_string("TB2 Value error",lcd.LCD_LINE_1)
                     D2.write("1")
