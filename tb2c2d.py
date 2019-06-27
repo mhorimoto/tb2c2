@@ -1,7 +1,7 @@
 #! /usr/bin/python3
 #coding: utf-8
 #
-#  Version 1.01
+#  Version 1.10
 #
 import os
 import signal
@@ -195,10 +195,10 @@ while(True):
 
         D3.write("1")
         D3.flush()
-        send_UECSdata("FLOW.mNB",i_tb2v,HOST)
-        send_UECSdata("VWC.mNB",i_vwc,HOST)
-        send_UECSdata("EC.mNB",i_ec,HOST)
-        send_UECSdata("TEMP.mNB",i_tp,HOST)
+        send_UECSdata("FLOW.mNB",f_ans,HOST)
+        send_UECSdata("VWC.mNB",vwc,HOST)
+        send_UECSdata("EC.mNB",ec,HOST)
+        send_UECSdata("TEMP.mNB",tp,HOST)
         D3.write("0")
         D3.flush()
 
@@ -206,26 +206,35 @@ while(True):
     if (a.second>50):
         lcd.lcd_string(ip,lcd.LCD_LINE_2)
     elif (a.second>40):
-        msg = "UECS TB2C2 V1.01"
+        msg = "UECS TB2C2 V1.10"
         lcd.lcd_string(msg,lcd.LCD_LINE_2)
     elif (a.second>30):
         lcd.lcd_string(ip,lcd.LCD_LINE_2)
     elif (a.second>20):
-        msg = "UECS TB2C2 V1.01"
-        lcd.lcd_string(msg,lcd.LCD_LINE_2)
+        l = lcd.LCD_LINE_1
+        a1 = f_ans
+        a2 = vwc
+        u = "TB:{0:4.1f} VWC:{1:4.1f}".format(a1,a2)
+        lcd.lcd_string(u,l)
+        l = lcd.LCD_LINE_2
+        a1 = ec
+        a2 = tp
+        u = "EC:{0:4.2f} TP:{1:4.1f}".format(a1,a2)
+        lcd.lcd_string(u,l)
     elif (a.second>10):
         lcd.lcd_string(ip,lcd.LCD_LINE_2)
     else:
         l = lcd.LCD_LINE_1
-        a1 = i_tb2v/10.0
-        a2 = i_vwc/10.0 
+        a1 = f_ans
+        a2 = vwc
         u = "TB:{0:4.1f} VWC:{1:4.1f}".format(a1,a2)
         lcd.lcd_string(u,l)
         l = lcd.LCD_LINE_2
-        a1 = i_ec/100.0
-        a2 = i_tp/10.0 
+        a1 = ec
+        a2 = tp
         u = "EC:{0:4.2f} TP:{1:4.1f}".format(a1,a2)
         lcd.lcd_string(u,l)
         
     prevsec = a.second
     time.sleep(1)
+    send_UECSdata("cnd.mNB",0,HOST)

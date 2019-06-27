@@ -37,16 +37,6 @@ class ServerThread(threading.Thread):
         self.mac = uuid.UUID(int=self.node)
         self.macaddr = self.mac.hex[-12:].upper()
 
-    def send_cnd(self):
-        ccm = ET.parse(config['NODE']['xmlfile'])
-        self.sdata = "{0}{1}<DATA type=\"cnd.mXX\" room=\"0\" region=\"0\" order=\"0\" priority=\"29\">"\
-                     "0</DATA><IP>{2}</IP></UECS>".\
-                     format(XML_HEADER,UECS_HEADER,self.ipaddress)
-        self.broadaddress = (ADDRESS,PORT)
-        self.udpServSock.sendto(self.sdata.encode('utf-8'),self.broadaddress)
-        
-
-
     def run(self):
         while True:
 #            try:
@@ -117,9 +107,4 @@ if __name__ == '__main__':
         if not th.data:
             pass
         # print(th.data)
-        itv += 1
         time.sleep(0.1)
-        if (itv>=10):
-            th.send_cnd()
-            itv = 0
-            
