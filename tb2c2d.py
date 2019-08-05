@@ -1,7 +1,7 @@
 #! /usr/bin/python3
 #coding: utf-8
 #
-#  Version 1.10
+#  Version 1.20
 #
 import os
 import signal
@@ -197,10 +197,10 @@ while(True):
 
         D3.write("1")
         D3.flush()
-        send_UECSdata("FLOW.mNB",f_ans,HOST)
-        send_UECSdata("VWC.mNB",vwc,HOST)
-        send_UECSdata("EC.mNB",ec,HOST)
-        send_UECSdata("TEMP.mNB",tp,HOST)
+        send_UECSdata("FLOW.mNB",i_tb2v,HOST)
+        send_UECSdata("VWC.mNB",i_vwc,HOST)
+        send_UECSdata("EC.mNB",i_ec,HOST)
+        send_UECSdata("TEMP.mNB",i_tp,HOST)
         D3.write("0")
         D3.flush()
 
@@ -208,7 +208,7 @@ while(True):
     if (a.second>50):
         lcd.lcd_string(ip,lcd.LCD_LINE_2)
     elif (a.second>40):
-        msg = "UECS TB2C2 V1.10"
+        msg = "UECS TB2C2 V1.20"
         lcd.lcd_string(msg,lcd.LCD_LINE_2)
     elif (a.second>30):
         lcd.lcd_string(ip,lcd.LCD_LINE_2)

@@ -3,7 +3,7 @@
 UECSインタフェースを使って排液量データを送出するデーモン
 
 
-Version 0.01  
+Version 1.20  
 horimoto@holly-linux.com
 
 Python3で動作する。
@@ -17,7 +17,8 @@ Python3で動作する。
  * import netifaces
  * import smbus
  * from socket import *
-
+ * OPi.GPIO (後述する)
+ 
 ## CCM
 
     <?xml version="1.0" encoding="UTF-8"?>
@@ -86,3 +87,22 @@ config.iniを変更することで、room,region,order,priorityの設定を変�
     systemctl start tb2c2
     systemctl start scanresponse
     
+
+## OPi.GPIO
+
+ RPiで使われているRPi.GPIOのOrangePi版。
+ [https://github.com/rm-hull/OPi.GPIO]
+
+
+    $ sudo apt install python-setuptools
+    $ sudo apt install python3-pip
+    $ sudo pip3 install --upgrade OPi.GPIO
+
+ 今のところ、
+
+    import orangepi.one
+    from OPi import GPIO
+    GPIO.setmode(orangepi.one.BOARD)
+
+ しか有効ではない。BCMを使ってもBOARDになるので注意。
+ 
