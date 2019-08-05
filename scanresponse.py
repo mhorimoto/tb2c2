@@ -100,7 +100,7 @@ class ServerThread(threading.Thread):
                                                ccmtt['priority'],ccmt.attrib['cast'],ccmt.attrib['unit'],ccmt.attrib['SR'],
                                                ccmt.attrib['LV'],ccmt.text)
                     ccmdata += "</UECS>"
-                    self.udpServSock.sendto(ccmdata.encode('utf-8'),self.addr)
+                    self.udpServSock.sendto(ccmdata.encode('utf-8'),(self.addr[0],PORT))
                 else:
                     pass
 #            except:
