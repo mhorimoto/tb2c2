@@ -3,6 +3,7 @@ EXECP=/usr/local/bin/tb2c2d.py
 SCANP=/usr/local/bin/scanresponse.py
 SYSCD=/etc/systemd/system/tb2c2.service
 SCAND=/etc/systemd/system/scanresponse.service
+WEBD=/etc/systemd/system/cgiserver.service
 TARGD=/usr/local/bin
 CFGFD=/etc/uecs
 NTPDC=/etc/ntp.conf

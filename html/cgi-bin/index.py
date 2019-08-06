@@ -20,7 +20,7 @@ html_head = """
 """
 html_body_node = """
   <body>
-    <H1>{0} {1} 設定内容</H1>
+    <H1>{0} {1} 設定内容 Ver.1.30</H1>
     <h2>ノード情報</h2>
     <table border=1>
       <tr><th>Name</th><td>{1}</td></tr>

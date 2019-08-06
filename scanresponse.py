@@ -1,6 +1,6 @@
 #! /usr/bin/python3
 #coding: utf-8
-# Version 1.3d
+# Version 1.30
 #
 import datetime
 import time

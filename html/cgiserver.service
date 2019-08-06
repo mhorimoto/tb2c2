@@ -1,0 +1,11 @@
+[Unit]
+Description = Web Service
+After = rc-local.service
+
+[Service]
+ExecStart = /etc/uecs/html/httpd.sh
+Restart = always
+Type = simple
+
+[Install]
+WantedBy = multi-user.target
