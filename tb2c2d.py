@@ -1,7 +1,7 @@
 #! /usr/bin/python3
 #coding: utf-8
 #
-#  Version 1.20
+#  Version 1.3d
 #
 import os
 import signal
@@ -208,7 +208,7 @@ while(True):
     if (a.second>50):
         lcd.lcd_string(ip,lcd.LCD_LINE_2)
     elif (a.second>40):
-        msg = "UECS TB2C2 V1.20"
+        msg = "UECS TB2C2 V1.3d"
         lcd.lcd_string(msg,lcd.LCD_LINE_2)
     elif (a.second>30):
         lcd.lcd_string(ip,lcd.LCD_LINE_2)

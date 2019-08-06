@@ -1,5 +1,7 @@
 #! /usr/bin/python3
 #coding: utf-8
+# Version 1.3d
+#
 import datetime
 import time
 import configparser
