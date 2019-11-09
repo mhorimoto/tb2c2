@@ -1,7 +1,7 @@
 #! /usr/bin/python3
 #coding: utf-8
 #
-#  Version 1.30
+#  Version 1.40
 #
 import os
 import signal
@@ -13,6 +13,7 @@ import configparser
 import netifaces
 from wd3init import wd3init
 from socket import *
+import ambient
 
 tb2initok = True
 tb2ok     = True
@@ -20,12 +21,18 @@ wd3initok = True
 wd3ok     = True
 
 i_tb2v = 0
+f_ans  = 0.0
 i_vwc  = 0
+vwc    = 0.0
 i_ec   = 0
+ec     = 0.0
 i_tp   = 0
+tp     = 0.0
 
-HOST = netifaces.ifaddresses('eth0')[netifaces.AF_INET][0]['addr']
-ADDRESS = netifaces.ifaddresses('eth0')[netifaces.AF_INET][0]['broadcast']
+#HOST = netifaces.ifaddresses('eth0')[netifaces.AF_INET][0]['addr']
+#ADDRESS = netifaces.ifaddresses('eth0')[netifaces.AF_INET][0]['broadcast']
+HOST = netifaces.ifaddresses('tun0')[netifaces.AF_INET][0]['addr']
+ADDRESS = netifaces.ifaddresses('tun0')[netifaces.AF_INET][0]['peer']
 PORT = 16520
 
 def send_UECSdata(typename,data,ip):
@@ -99,7 +106,12 @@ except serial.serialutil.SerialException:
 #  WD-3 port initilize
 #
 wd3 = wd3init()
-    
+
+#
+#  Ambient initilize
+#
+am = ambient.Ambient(config['Ambient']['chid'],config['Ambient']['wrkey'])
+
 while(True):
     a=datetime.datetime.now()
     if (prevsec > a.second):
@@ -201,6 +213,7 @@ while(True):
         send_UECSdata("VWC.mNB",i_vwc,HOST)
         send_UECSdata("EC.mNB",i_ec,HOST)
         send_UECSdata("TEMP.mNB",i_tp,HOST)
+        amr = am.send({'d1': f_ans, 'd2': vwc, 'd3': ec, 'd4': tp})
         D3.write("0")
         D3.flush()
 
@@ -208,7 +221,7 @@ while(True):
     if (a.second>50):
         lcd.lcd_string(ip,lcd.LCD_LINE_2)
     elif (a.second>40):
-        msg = "UECS TB2C2 V1.30"
+        msg = "UECS TB2C2 V1.40"
         lcd.lcd_string(msg,lcd.LCD_LINE_2)
     elif (a.second>30):
         lcd.lcd_string(ip,lcd.LCD_LINE_2)
