@@ -89,6 +89,11 @@ config.iniを変更することで、room,region,order,priorityの設定を変�
  詳細は、Makefileの中を見る。  
  /etc/uecs/config.iniを編集する。上書きに備えて直ぐにバックアップをconfig.ini-backなどとコピーしておく。
  
+ Ambientのインストール
+
+     sudo apt install python3-pip
+     sudo apt install python3-setuptools
+     sudo pip3 install git+https://github.com/AmbientDataInc/ambient-python-lib.git
 
 ### 起動の方法
 
