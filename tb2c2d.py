@@ -1,7 +1,7 @@
 #! /usr/bin/python3
 #coding: utf-8
 #
-#  Version 1.40
+#  Version 1.42
 #
 import os
 import signal
@@ -52,7 +52,12 @@ def send_UECSdata(typename,data,ip):
 ###################################################
 
 config = configparser.ConfigParser()
-config.read('/etc/uecs/config.ini')
+config.read('/etc/uecs/config.ini',encoding="utf-8")
+
+ambflag = False
+if 'Ambient' in config:
+    if ('chid' in config['Ambient']) and ('wrkey' in config['Ambient']):
+        ambflag = True
 
 lcd.lcd_init()
 prevsec = 0
@@ -110,11 +115,12 @@ wd3 = wd3init()
 #
 #  Ambient initilize
 #
-am = ambient.Ambient(config['Ambient']['chid'],config['Ambient']['wrkey'])
+if ambflag:
+    am = ambient.Ambient(config['Ambient']['chid'],config['Ambient']['wrkey'])
 
 while(True):
     a=datetime.datetime.now()
-    if (prevsec > a.second):
+    if (prevsec > a.second):    # 59秒から0秒で逆転することから1分経過を意味する
         ##################################################################
         #
         # Read data from TB2
@@ -145,6 +151,13 @@ while(True):
                     lcd.lcd_string("TB2 Value error",lcd.LCD_LINE_1)
                     D2.write("1")
                     D2.flush()
+            if os.path.isfile("/tmp/tb2-zero"):
+                os.remove("/tmp/tb2-zero")
+                tb2.write("b".encode())
+                time.sleep(0.05)  # Wait for 50mSec
+                tb2.write("b".encode())
+                time.sleep(0.05)  # Wait for 50mSec
+                                
         else:
             print("tb2init NG")
             lcd.lcd_string("tb2init NG",lcd.LCD_LINE_1)
@@ -213,7 +226,8 @@ while(True):
         send_UECSdata("VWC.mNB",i_vwc,HOST)
         send_UECSdata("EC.mNB",i_ec,HOST)
         send_UECSdata("TEMP.mNB",i_tp,HOST)
-        amr = am.send({'d1': f_ans, 'd2': vwc, 'd3': ec, 'd4': tp})
+        if ambflag:
+            amr = am.send({'d1': f_ans, 'd2': vwc, 'd3': ec, 'd4': tp})
         D3.write("0")
         D3.flush()
 
@@ -221,7 +235,7 @@ while(True):
     if (a.second>50):
         lcd.lcd_string(ip,lcd.LCD_LINE_2)
     elif (a.second>40):
-        msg = "UECS TB2C2 V1.40"
+        msg = "UECS TB2C2 V1.42"
         lcd.lcd_string(msg,lcd.LCD_LINE_2)
     elif (a.second>30):
         lcd.lcd_string(ip,lcd.LCD_LINE_2)
