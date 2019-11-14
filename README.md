@@ -3,10 +3,13 @@
 UECSインタフェースを使って排液量データを送出するデーモン
 
 
-Version 1.20  
+Version 1.42  
 horimoto@holly-linux.com
 
 Python3で動作する。
+
+1.42はAmbient対応している。/etc/uecs/config.iniにAmbient設定を書き込むことでAmbientにもデータを送り出す。
+
 
 ## 必要なモジュール
 
@@ -38,6 +41,7 @@ Python3で動作する。
 config.iniを変更することで、room,region,order,priorityの設定を変更することが出来る。
 
     [NODE]
+    jname = 排液量センサ
     name = TB2C2
     vender = HOLLY
     uecsid = 10100C000002
@@ -72,13 +76,19 @@ config.iniを変更することで、room,region,order,priorityの設定を変�
     region = 0
     order = 0
     priority = 29
+    
+    [Ambient]
+    chid = 1***9
+    wrkey = 5***55a2***682a7
+
 
 ### インストールの方法
 
     sudo make install
 
- 詳細は、Makefileの中を見る。
-
+ 詳細は、Makefileの中を見る。  
+ /etc/uecs/config.iniを編集する。上書きに備えて直ぐにバックアップをconfig.ini-backなどとコピーしておく。
+ 
 
 ### 起動の方法
 
