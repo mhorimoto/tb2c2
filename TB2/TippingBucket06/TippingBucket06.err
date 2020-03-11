@@ -1,0 +1,4 @@
+>>> Warning 203 "TippingBucket06.c" Line 171(1,1): Condition always TRUE
+      Memory usage:   ROM=86%      RAM=9% - 20%
+      0 Errors,  1 Warnings.
+Build Successful.

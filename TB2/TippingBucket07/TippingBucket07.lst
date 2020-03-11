@@ -1,0 +1,1824 @@
+CCS PCM C Compiler, Version 4.137, 5773               31-1-17 23:59
+
+               Filename: C:\Workspace\workspacepic\project16\TippingBucket07\TippingBucket07.lst
+
+               ROM used: 3001 words (73%)
+                         Largest free fragment is 978
+               RAM used: 30 (8%) at main() level
+                         73 (20%) worst case
+               Stack:    4 worst case (3 in main + 1 for interrupts)
+
+*
+0000:  NOP
+0001:  MOVLP  08
+0002:  GOTO   000
+*
+0004:  CLRF   03
+0005:  CLRF   0A
+0006:  MOVLB  00
+0007:  MOVF   77,W
+0008:  MOVWF  20
+0009:  MOVF   78,W
+000A:  MOVWF  21
+000B:  MOVF   79,W
+000C:  MOVWF  22
+000D:  MOVF   7A,W
+000E:  MOVWF  23
+000F:  BTFSS  0B.4
+0010:  GOTO   013
+0011:  BTFSC  0B.1
+0012:  GOTO   02E
+0013:  BTFSS  0B.5
+0014:  GOTO   017
+0015:  BTFSC  0B.2
+0016:  GOTO   030
+0017:  CLRF   05
+0018:  MOVLW  91
+0019:  MOVWF  04
+001A:  BTFSS  00.2
+001B:  GOTO   01E
+001C:  BTFSC  11.2
+001D:  GOTO   032
+001E:  CLRF   05
+001F:  MOVLW  91
+0020:  MOVWF  04
+0021:  BTFSS  00.5
+0022:  GOTO   025
+0023:  BTFSC  11.5
+0024:  GOTO   034
+0025:  MOVF   20,W
+0026:  MOVWF  77
+0027:  MOVF   21,W
+0028:  MOVWF  78
+0029:  MOVF   22,W
+002A:  MOVWF  79
+002B:  MOVF   23,W
+002C:  MOVWF  7A
+002D:  RETFIE
+002E:  MOVLP  00
+002F:  GOTO   065
+0030:  MOVLP  00
+0031:  GOTO   036
+0032:  MOVLP  00
+0033:  GOTO   03C
+0034:  MOVLP  00
+0035:  GOTO   077
+.................... /**************************************** 
+.................... *	Tipping Bucket07 
+.................... *	量産試験機 
+.................... *	転倒ます方式(2017.1.31) 
+.................... ***************************************/ 
+.................... #include  <16f1827.h> 
+.................... //////// Standard Header file for the PIC16F1827 device //////////////// 
+.................... #device PIC16F1827 
+.................... #list 
+....................  
+....................   
+.................... #fuses HS,WDT_SW,NOPROTECT,PUT,BROWNOUT,NOLVP,MCLR,NOIESO,NOFCMEN,NODEBUG,BORV25,PLL_SW 
+....................  
+.................... #use delay(CLOCK = 10000000)			//Specification of a clock frequency 
+*
+00A5:  MOVLW  20
+00A6:  MOVWF  05
+00A7:  MOVLW  21
+00A8:  MOVWF  04
+00A9:  MOVF   00,W
+00AA:  BTFSC  03.2
+00AB:  GOTO   0BA
+00AC:  MOVLW  03
+00AD:  MOVWF  78
+00AE:  CLRF   77
+00AF:  DECFSZ 77,F
+00B0:  GOTO   0AF
+00B1:  DECFSZ 78,F
+00B2:  GOTO   0AE
+00B3:  MOVLW  3C
+00B4:  MOVWF  77
+00B5:  DECFSZ 77,F
+00B6:  GOTO   0B5
+00B7:  GOTO   0B8
+00B8:  DECFSZ 00,F
+00B9:  GOTO   0AC
+00BA:  RETURN
+.................... //#use fast_io(B) 
+....................  
+.................... ////// LCD library setup 
+.................... #define 	mode			0x05				//B0,B2:Input 
+.................... #define 	output_x		output_B			//PortB use 
+.................... #define 	set_tris_x	set_tris_B 
+.................... #define	stb			PIN_B1			//breadboard:PIN_A0 printed board:PIN_B1 
+.................... #define	rs			PIN_B4			//breadboard:PIN_A1 printed board:PIN_B4 
+.................... #define	DB7			PIN_B6 
+.................... #define	DB6			PIN_B7 
+.................... #define	DB5			PIN_B3 
+.................... #define	DB4			PIN_A1			//breadboard:PIN_B1 printed board:PIN_A1 
+.................... #define  Pulse		PIN_A2			//Pulse Output Pin 
+.................... #include  "lcd_lib.c" 
+.................... /********************************************** 
+.................... *  液晶表示器制御ライブラリ 
+.................... *  内蔵関数は以下 
+.................... *    lcd_init()    ----- 初期化 
+.................... *    lcd_cmd(cmd)  ----- コマンド出力 
+.................... *    lcd_data(chr) ----- １文字表示出力 
+.................... *    lcd_clear()   ----- 全消去 
+.................... ************************************************/ 
+.................... /********* データ出力サブ関数 **************/ 
+.................... void lcd_out(int code, int flag) 
+.................... { 
+.................... 	//output_x((code & 0xF0) | (input_x() & 0x0F)); 
+....................  
+.................... 	if((code & 0x80) == 0){ 
+00BB:  MOVF   4F,W
+00BC:  ANDLW  80
+00BD:  BTFSS  03.2
+00BE:  GOTO   0C5
+.................... 		output_bit(DB7, 0); 
+00BF:  MOVLB  02
+00C0:  BCF    0D.6
+00C1:  MOVLB  01
+00C2:  BCF    0D.6
+.................... 	} 
+.................... 	else{ 
+00C3:  GOTO   0C9
+00C4:  MOVLB  00
+.................... 		output_bit(DB7, 1); 
+00C5:  MOVLB  02
+00C6:  BSF    0D.6
+00C7:  MOVLB  01
+00C8:  BCF    0D.6
+.................... 	} 
+....................  
+.................... 	if((code & 0x40) == 0){ 
+00C9:  MOVLB  00
+00CA:  MOVF   4F,W
+00CB:  ANDLW  40
+00CC:  BTFSS  03.2
+00CD:  GOTO   0D4
+.................... 		output_bit(DB6, 0); 
+00CE:  MOVLB  02
+00CF:  BCF    0D.7
+00D0:  MOVLB  01
+00D1:  BCF    0D.7
+.................... 	} 
+.................... 	else{ 
+00D2:  GOTO   0D8
+00D3:  MOVLB  00
+.................... 		output_bit(DB6, 1); 
+00D4:  MOVLB  02
+00D5:  BSF    0D.7
+00D6:  MOVLB  01
+00D7:  BCF    0D.7
+.................... 	} 
+....................  
+.................... 	if((code & 0x20) == 0){ 
+00D8:  MOVLB  00
+00D9:  MOVF   4F,W
+00DA:  ANDLW  20
+00DB:  BTFSS  03.2
+00DC:  GOTO   0E3
+.................... 		output_bit(DB5, 0); 
+00DD:  MOVLB  02
+00DE:  BCF    0D.3
+00DF:  MOVLB  01
+00E0:  BCF    0D.3
+.................... 	} 
+.................... 	else{ 
+00E1:  GOTO   0E7
+00E2:  MOVLB  00
+.................... 		output_bit(DB5, 1); 
+00E3:  MOVLB  02
+00E4:  BSF    0D.3
+00E5:  MOVLB  01
+00E6:  BCF    0D.3
+.................... 	} 
+....................  
+.................... 	if((code & 0x10) == 0){ 
+00E7:  MOVLB  00
+00E8:  MOVF   4F,W
+00E9:  ANDLW  10
+00EA:  BTFSS  03.2
+00EB:  GOTO   0F2
+.................... 		output_bit(DB4, 0); 
+00EC:  MOVLB  02
+00ED:  BCF    0C.1
+00EE:  MOVLB  01
+00EF:  BCF    0C.1
+.................... 	} 
+.................... 	else{ 
+00F0:  GOTO   0F6
+00F1:  MOVLB  00
+.................... 		output_bit(DB4, 1); 
+00F2:  MOVLB  02
+00F3:  BSF    0C.1
+00F4:  MOVLB  01
+00F5:  BCF    0C.1
+.................... 	} 
+....................  
+.................... 	if (flag == 0){ 
+00F6:  MOVLB  00
+00F7:  MOVF   50,F
+00F8:  BTFSS  03.2
+00F9:  GOTO   100
+.................... 		output_high(rs);		//表示データの場合 
+00FA:  MOVLB  01
+00FB:  BCF    0D.4
+00FC:  MOVLB  02
+00FD:  BSF    0D.4
+.................... 	} 
+.................... 	else{ 
+00FE:  GOTO   104
+00FF:  MOVLB  00
+.................... 		output_low(rs);			//コマンドデータの場合 
+0100:  MOVLB  01
+0101:  BCF    0D.4
+0102:  MOVLB  02
+0103:  BCF    0D.4
+.................... 	} 
+.................... 	delay_cycles(1);			//NOP		 
+0104:  NOP
+.................... 	output_high(stb);			//strobe out 
+0105:  MOVLB  01
+0106:  BCF    0D.1
+0107:  MOVLB  02
+0108:  BSF    0D.1
+.................... 	delay_cycles(2);			//NOP 
+0109:  GOTO   10A
+.................... 	output_low(stb);			//reset strobe 
+010A:  MOVLB  01
+010B:  BCF    0D.1
+010C:  MOVLB  02
+010D:  BCF    0D.1
+....................  
+.................... } 
+010E:  MOVLB  00
+010F:  RETURN
+.................... /******** １文字表示関数 **********/ 
+.................... void lcd_data(int asci) 
+.................... { 
+.................... 	lcd_out(asci, 0);			//上位４ビット出力 
+*
+015F:  MOVF   4D,W
+0160:  MOVWF  4F
+0161:  CLRF   50
+0162:  CALL   0BB
+.................... 	lcd_out(asci<<4, 0);		//下位４ビット出力 
+0163:  SWAPF  4D,W
+0164:  MOVWF  4E
+0165:  MOVLW  F0
+0166:  ANDWF  4E,F
+0167:  MOVF   4E,W
+0168:  MOVWF  4F
+0169:  CLRF   50
+016A:  CALL   0BB
+.................... 	delay_us(50);				//50μsec待ち 
+016B:  MOVLW  29
+016C:  MOVWF  77
+016D:  DECFSZ 77,F
+016E:  GOTO   16D
+016F:  NOP
+.................... } 
+0170:  RETURN
+.................... /******** コマンド出力関数 ********/ 
+.................... void lcd_cmd(int cmd) 
+.................... { 
+.................... 	lcd_out(cmd, 1);			//上位４ビット出力 
+*
+0110:  MOVF   40,W
+0111:  MOVWF  4F
+0112:  MOVLW  01
+0113:  MOVWF  50
+0114:  CALL   0BB
+.................... 	lcd_out(cmd<<4, 1);			//下位４ビット出力 
+0115:  SWAPF  40,W
+0116:  MOVWF  41
+0117:  MOVLW  F0
+0118:  ANDWF  41,F
+0119:  MOVF   41,W
+011A:  MOVWF  4F
+011B:  MOVLW  01
+011C:  MOVWF  50
+011D:  CALL   0BB
+.................... 	delay_ms(2);				//2msec待ち 
+011E:  MOVLW  02
+011F:  MOVWF  41
+0120:  CALL   0A5
+.................... } 
+0121:  RETURN
+.................... /********** 全消去関数 *********/ 
+.................... void lcd_clear() 
+.................... { 
+.................... 	lcd_cmd(0x01);				//初期化コマンド出力 
+*
+0158:  MOVLW  01
+0159:  MOVWF  40
+015A:  CALL   110
+.................... 	delay_ms(15);				//15msec待ち 
+015B:  MOVLW  0F
+015C:  MOVWF  41
+015D:  CALL   0A5
+.................... } 
+015E:  RETURN
+.................... /******** 初期化関数 *********/ 
+.................... void lcd_init() 
+.................... { 
+.................... 	set_tris_x(mode);			//モードセット 
+*
+0122:  MOVLW  05
+0123:  TRIS   6
+.................... // 
+.................... //	set_tris_A(0xF0); 
+.................... //	 
+.................... 	delay_ms(15); 
+0124:  MOVLW  0F
+0125:  MOVWF  41
+0126:  CALL   0A5
+.................... 	lcd_out(0x30, 1);			//8bit mode set 
+0127:  MOVLW  30
+0128:  MOVWF  4F
+0129:  MOVLW  01
+012A:  MOVWF  50
+012B:  CALL   0BB
+.................... 	delay_ms(5); 
+012C:  MOVLW  05
+012D:  MOVWF  41
+012E:  CALL   0A5
+.................... 	lcd_out(0x30, 1);			//8bit mode set 
+012F:  MOVLW  30
+0130:  MOVWF  4F
+0131:  MOVLW  01
+0132:  MOVWF  50
+0133:  CALL   0BB
+.................... 	delay_ms(1); 
+0134:  MOVLW  01
+0135:  MOVWF  41
+0136:  CALL   0A5
+.................... 	lcd_out(0x30, 1);			//8bit mode set 
+0137:  MOVLW  30
+0138:  MOVWF  4F
+0139:  MOVLW  01
+013A:  MOVWF  50
+013B:  CALL   0BB
+.................... 	delay_ms(1); 
+013C:  MOVLW  01
+013D:  MOVWF  41
+013E:  CALL   0A5
+.................... 	lcd_out(0x20, 1);			//4bit mode set 
+013F:  MOVLW  20
+0140:  MOVWF  4F
+0141:  MOVLW  01
+0142:  MOVWF  50
+0143:  CALL   0BB
+.................... 	delay_ms(1); 
+0144:  MOVLW  01
+0145:  MOVWF  41
+0146:  CALL   0A5
+.................... 	lcd_cmd(0x2E);				//DL=0 4bit mode 
+0147:  MOVLW  2E
+0148:  MOVWF  40
+0149:  CALL   110
+.................... 	lcd_cmd(0x08);				//display off C=D=B=0 
+014A:  MOVLW  08
+014B:  MOVWF  40
+014C:  CALL   110
+.................... 	lcd_cmd(0x0D);				//display on C=D=1 B=0 
+014D:  MOVLW  0D
+014E:  MOVWF  40
+014F:  CALL   110
+.................... 	lcd_cmd(0x06);				//entry I/D=1 S=0 
+0150:  MOVLW  06
+0151:  MOVWF  40
+0152:  CALL   110
+.................... 	lcd_cmd(0x02);				//cursor home 
+0153:  MOVLW  02
+0154:  MOVWF  40
+0155:  CALL   110
+.................... } 
+0156:  MOVLP  08
+0157:  GOTO   031 (RETURN)
+....................  
+....................  
+....................  
+.................... ////// Define Address 
+.................... #bit		T1Start = 0x018.0	// 0:Stop Timer1, 1:Start Timer1 
+....................  
+.................... ////// RS-232C use setup 
+.................... #use rs232(BAUD =19200, XMIT=PIN_B5, RCV=PIN_B2) 
+....................  
+.................... ////// Flow Meter setup 
+.................... #define	r_bucket		0.180				// Capacity of Right Bucket 
+.................... //ver1:0.19925 ver2:0.1944 
+.................... #define	l_bucket		0.180				// Capacity of Left Bucket 
+.................... //ver1:0.1906 ver2:0.179 
+.................... const	float 		bucket_flow =  0.180;// Average Capacity of Bucket (r_bucket+l_bucket)/2 
+.................... //ver1:0.194925 ver2: 0.1867 
+.................... static	long		g_tcnt;				// Timer0 overflow counter 
+*
+0825:  MOVLB  00
+0826:  CLRF   24
+0827:  CLRF   25
+.................... static	int			g_tx_flag;			// Data Request-to-Send Flag 
+0828:  CLRF   26
+.................... static	long		g_tcnt_ms =0;			// Time measurement of a RSW pulse interval[msec.] 
+.................... static	int			g_tcnt_min =0;			// Time measurement of a RSW pulse interval[min.] 
+.................... static	long		g_tcnt_result =0;		// The latest RSW pulse cycle[msec.] 
+.................... static	int			g_tcnt_result_min =0;		// The latest RSW pulse cycle[min.] 
+.................... static 	float		g_drainage_flow = 0.0;	// The amount of discharge of a liquid  
+.................... static 	float		g_before_offset = 0.0; // Liquid that has not been pulsed output 
+....................  
+.................... static	int			g_cal_flag;			// Flow calculation flag  
+0829:  CLRF   35
+....................  
+....................  
+.................... ///Timer0 interruption processing 
+.................... #INT_TIMER0 
+.................... void tip_cnt(){ 
+.................... 	g_tcnt++; 
+*
+0036:  INCF   24,F
+0037:  BTFSC  03.2
+0038:  INCF   25,F
+.................... 	//printf("OK\n"); ////debug 
+.................... } 
+....................  
+.................... // CCP1 interruption processing　(1msec Cycle) 
+0039:  BCF    0B.2
+003A:  MOVLP  00
+003B:  GOTO   025
+.................... #INT_CCP1 
+.................... void isr_ccp1(void){ 
+.................... 	if(g_tcnt_ms < 60000){ 
+003C:  MOVF   28,W
+003D:  SUBLW  EA
+003E:  BTFSS  03.0
+003F:  GOTO   04A
+0040:  BTFSS  03.2
+0041:  GOTO   046
+0042:  MOVF   27,W
+0043:  SUBLW  5F
+0044:  BTFSS  03.0
+0045:  GOTO   04A
+.................... 		g_tcnt_ms++; 
+0046:  INCF   27,F
+0047:  BTFSC  03.2
+0048:  INCF   28,F
+.................... 	} 
+....................     else if(g_tcnt_min < 3 && g_tcnt_ms >= 60000){ 
+0049:  GOTO   062
+004A:  MOVF   29,W
+004B:  SUBLW  02
+004C:  BTFSS  03.0
+004D:  GOTO   061
+004E:  MOVF   28,W
+004F:  SUBLW  E9
+0050:  BTFSC  03.0
+0051:  GOTO   061
+0052:  XORLW  FF
+0053:  BTFSS  03.2
+0054:  GOTO   059
+0055:  MOVF   27,W
+0056:  SUBLW  5F
+0057:  BTFSC  03.0
+0058:  GOTO   061
+....................         g_tcnt_min++; 
+0059:  INCF   29,F
+.................... 		g_tcnt_ms = 0; 
+005A:  CLRF   28
+005B:  CLRF   27
+.................... 		 
+.................... 		T1Start = 0; 
+005C:  BCF    18.0
+.................... 		set_timer1(0); 
+005D:  CLRF   17
+005E:  CLRF   16
+.................... 		T1Start = 1;	// Start Timer1 
+005F:  BSF    18.0
+.................... 	} 
+.................... 	else{ 
+0060:  GOTO   062
+.................... 		T1Start = 0;	// Stop Timer1 
+0061:  BCF    18.0
+.................... 	}	 
+.................... } 
+....................  
+.................... ///EXT interruption processing (time measurement of a RSW pulse interval) 
+0062:  BCF    11.2
+0063:  MOVLP  00
+0064:  GOTO   025
+.................... #INT_EXT 
+.................... void isr_ext(void){ 
+.................... 	g_cal_flag = 1; 
+0065:  MOVLW  01
+0066:  MOVWF  35
+.................... 	g_tcnt_result = g_tcnt_ms; 
+0067:  MOVF   28,W
+0068:  MOVWF  2B
+0069:  MOVF   27,W
+006A:  MOVWF  2A
+.................... 	g_tcnt_result_min = g_tcnt_min; 
+006B:  MOVF   29,W
+006C:  MOVWF  2C
+.................... 	g_tcnt_ms = 0; 
+006D:  CLRF   28
+006E:  CLRF   27
+.................... 	g_tcnt_min = 0; 
+006F:  CLRF   29
+.................... 		 
+.................... 	T1Start = 0; 
+0070:  BCF    18.0
+.................... 	set_timer1(0); 
+0071:  CLRF   17
+0072:  CLRF   16
+.................... 	T1Start = 1;	// Start Timer1 
+0073:  BSF    18.0
+.................... }	 
+....................  
+....................  
+.................... ///RS232c reception interruption processing 
+0074:  BCF    0B.1
+0075:  MOVLP  00
+0076:  GOTO   025
+.................... #INT_RDA 
+.................... void isr_rcv(){ 
+.................... 	char RcvData; 
+.................... 	RcvData = getc(); 
+0077:  BTFSS  11.5
+0078:  GOTO   077
+0079:  MOVLB  03
+007A:  MOVF   19,W
+007B:  MOVLB  00
+007C:  MOVWF  5A
+.................... 	 
+.................... 	if(RcvData == 0x61){ 		//When transmitting "a"(Shift JIS)  
+007D:  MOVF   5A,W
+007E:  SUBLW  61
+007F:  BTFSS  03.2
+0080:  GOTO   084
+.................... 		g_tx_flag = 1; 
+0081:  MOVLW  01
+0082:  MOVWF  26
+.................... 	} 
+.................... 	 
+.................... 	else if(RcvData == 0x62){	//When transmitting "b"(Shift JIS)  
+0083:  GOTO   095
+0084:  MOVF   5A,W
+0085:  SUBLW  62
+0086:  BTFSS  03.2
+0087:  GOTO   095
+.................... 		g_tcnt = 0; 
+0088:  CLRF   25
+0089:  CLRF   24
+.................... 		g_tcnt_ms = 0; 
+008A:  CLRF   28
+008B:  CLRF   27
+.................... 		g_tcnt_min = 0; 
+008C:  CLRF   29
+.................... 		g_tcnt_result = 0; 
+008D:  CLRF   2B
+008E:  CLRF   2A
+.................... 		g_tcnt_result_min = 0;  
+008F:  CLRF   2C
+.................... 		g_drainage_flow = 0.0; 
+0090:  CLRF   30
+0091:  CLRF   2F
+0092:  CLRF   2E
+0093:  CLRF   2D
+.................... 		set_timer0(0); 
+0094:  CLRF   15
+.................... 	} 
+.................... 	else{} 
+.................... } 
+....................  
+....................  
+....................  
+0095:  BCF    11.5
+0096:  MOVLP  00
+0097:  GOTO   025
+.................... void main() 
+.................... { 
+*
+0800:  CLRF   05
+0801:  CLRF   04
+0802:  MOVLW  1F
+0803:  ANDWF  03,F
+0804:  MOVLB  02
+0805:  BSF    1E.0
+0806:  BSF    1D.7
+0807:  MOVLW  20
+0808:  MOVLB  03
+0809:  MOVWF  1B
+080A:  MOVLW  A6
+080B:  MOVWF  1E
+080C:  MOVLW  90
+080D:  MOVWF  1D
+080E:  MOVLB  00
+080F:  CLRF   28
+0810:  CLRF   27
+0811:  CLRF   29
+0812:  CLRF   2B
+0813:  CLRF   2A
+0814:  CLRF   2C
+0815:  CLRF   30
+0816:  CLRF   2F
+0817:  CLRF   2E
+0818:  CLRF   2D
+0819:  CLRF   34
+081A:  CLRF   33
+081B:  CLRF   32
+081C:  CLRF   31
+081D:  MOVLB  03
+081E:  CLRF   0C
+081F:  CLRF   0D
+0820:  MOVLB  02
+0821:  CLRF   12
+0822:  CLRF   11
+0823:  CLRF   14
+0824:  CLRF   13
+.................... 	////-- Initialization --//// 
+.................... 	 
+.................... 	/////Pulse Output Pin 
+.................... 	output_bit(Pulse,1); 
+*
+082A:  MOVLB  02
+082B:  BSF    0C.2
+082C:  MOVLB  01
+082D:  BCF    0C.2
+.................... 	 
+.................... 	//// LCD Initialization 
+.................... 	lcd_init();	 
+082E:  MOVLP  00
+082F:  MOVLB  00
+0830:  GOTO   122
+0831:  MOVLP  08
+.................... 	lcd_cmd(0x0C); 
+0832:  MOVLW  0C
+0833:  MOVWF  40
+0834:  MOVLP  00
+0835:  CALL   110
+0836:  MOVLP  08
+.................... 	lcd_clear(); 
+0837:  MOVLP  00
+0838:  CALL   158
+0839:  MOVLP  08
+.................... 	 
+.................... 	//// Timer0 Initialization　External clock 1/1 
+.................... 	setup_timer_0(RTCC_EXT_L_TO_H | RTCC_DIV_1); 
+083A:  MOVLB  01
+083B:  MOVF   15,W
+083C:  ANDLW  C7
+083D:  IORLW  28
+083E:  MOVWF  15
+.................... 	set_timer0(0); 
+083F:  MOVLB  00
+0840:  CLRF   15
+.................... 	 
+.................... 	/// Timer1 Initialization Internal clock prescaler 1/1	 
+.................... 	setup_timer_1(T1_INTERNAL | T1_DIV_BY_1); 
+0841:  MOVLW  05
+0842:  MOVWF  18
+0843:  CLRF   19
+.................... 	T1Start = 0;		// Stop Timer1 
+0844:  BCF    18.0
+.................... 	set_timer1(0); 
+0845:  CLRF   17
+0846:  CLRF   16
+.................... 	 
+.................... 	/// CCP1Initialization　1msec 
+.................... 	setup_ccp1(CCP_COMPARE_RESET_TIMER); 
+0847:  MOVLB  02
+0848:  BCF    1D.0
+0849:  BCF    1D.1
+084A:  BCF    1D.2
+084B:  MOVLB  01
+084C:  BCF    0D.3
+084D:  MOVLB  02
+084E:  BCF    0D.3
+084F:  MOVLW  0B
+0850:  MOVLB  05
+0851:  MOVWF  13
+0852:  CLRF   14
+0853:  CLRF   15
+0854:  BCF    1E.0
+0855:  BCF    1E.1
+0856:  MOVLW  01
+0857:  MOVWF  16
+.................... 	CCP_1 = 2500; 	//1kHz(=10MHz/(4*1*2500)) 
+0858:  MOVLW  09
+0859:  MOVWF  12
+085A:  MOVLW  C4
+085B:  MOVWF  11
+.................... 	 
+.................... 	//Edge of external interruption(RB0) 
+.................... 	ext_int_edge(L_TO_H);	 
+085C:  MOVLB  01
+085D:  BSF    15.6
+.................... 	 
+.................... 	//WDT Initialization 
+.................... 	setup_wdt(WDT_2S);	 
+085E:  MOVLW  17
+085F:  MOVWF  17
+....................  
+.................... 	enable_interrupts(INT_TIMER0); 
+0860:  BSF    0B.5
+.................... 	enable_interrupts(INT_CCP1); 
+0861:  BSF    11.2
+.................... 	enable_interrupts(INT_EXT); 
+0862:  BSF    0B.4
+.................... 	enable_interrupts(INT_RDA); 
+0863:  BSF    11.5
+.................... 	enable_interrupts(GLOBAL); 
+0864:  MOVLW  C0
+0865:  IORWF  0B,F
+.................... 	 
+.................... 	long	drainage_cnt;			//The number of times of Tipping Bucket 
+.................... 	//float	flow_v;				//The present flow velocity 
+.................... 	float 	bucket_offset;		//The offset value of bucket capacity 
+.................... 	float 	Pulse_flow;			//Liquid pulse output before 
+.................... 	g_tcnt = 0; 
+0866:  MOVLB  00
+0867:  CLRF   25
+0868:  CLRF   24
+.................... 	 
+.................... 	//----------- Debug ------------ 
+.................... 	//float	bucket_flow; 
+.................... 	//bucket_flow = (r_bucket+l_bucket)/2; 
+.................... 	//------------------------------ 
+.................... 	 
+.................... 	lcd_clear(); 
+0869:  MOVLP  00
+086A:  CALL   158
+086B:  MOVLP  08
+.................... 	printf(lcd_data,"restart"); 
+086C:  MOVLW  98
+086D:  MOVLB  03
+086E:  MOVWF  11
+086F:  MOVLW  00
+0870:  MOVWF  12
+0871:  MOVLP  00
+0872:  MOVLB  00
+0873:  GOTO   171
+0874:  MOVLP  08
+.................... 	delay_ms(1000); 
+0875:  MOVLW  04
+0876:  MOVWF  40
+0877:  MOVLW  FA
+0878:  MOVWF  41
+0879:  MOVLP  00
+087A:  CALL   0A5
+087B:  MOVLP  08
+087C:  DECFSZ 40,F
+087D:  GOTO   077
+.................... 	 
+.................... 	T1Start = 1;	// Start Timer1 
+087E:  BSF    18.0
+.................... 	 
+.................... 	while(1)							 
+.................... 	{ 
+.................... 		restart_wdt(); 
+087F:  CLRWDT
+.................... 		drainage_cnt =g_tcnt * 256 + (long)get_timer0(); 
+0880:  MOVF   24,W
+0881:  MOVWF  41
+0882:  CLRF   40
+0883:  MOVF   15,W
+0884:  CLRF   7A
+0885:  ADDWF  40,W
+0886:  MOVWF  36
+0887:  MOVF   7A,W
+0888:  ADDWFC 41,W
+0889:  MOVWF  37
+.................... 		//printf("ms= %Ldms\n", g_tcnt_ms); ////debug 
+....................  
+.................... 		if(g_cal_flag == 1){ 
+088A:  DECFSZ 35,W
+088B:  GOTO   32C
+.................... 			if((g_tcnt_result_min == 0) && (g_tcnt_result < 2000) ){ 
+088C:  MOVF   2C,F
+088D:  BTFSS  03.2
+088E:  GOTO   112
+088F:  MOVF   2B,W
+0890:  SUBLW  07
+0891:  BTFSS  03.0
+0892:  GOTO   112
+0893:  BTFSS  03.2
+0894:  GOTO   099
+0895:  MOVF   2A,W
+0896:  SUBLW  CF
+0897:  BTFSS  03.0
+0898:  GOTO   112
+.................... 				bucket_offset =  0.063; 
+0899:  MOVLW  25
+089A:  MOVWF  3B
+089B:  MOVLW  06
+089C:  MOVWF  3A
+089D:  MOVLW  01
+089E:  MOVWF  39
+089F:  MOVLW  7B
+08A0:  MOVWF  38
+.................... 				//ver1:0.163 ver2: 0.1565 
+.................... 				g_drainage_flow = g_drainage_flow + bucket_flow + bucket_offset; 
+08A1:  BCF    03.1
+08A2:  MOVF   30,W
+08A3:  MOVWF  47
+08A4:  MOVF   2F,W
+08A5:  MOVWF  46
+08A6:  MOVF   2E,W
+08A7:  MOVWF  45
+08A8:  MOVF   2D,W
+08A9:  MOVWF  44
+08AA:  MOVLW  EC
+08AB:  MOVWF  4B
+08AC:  MOVLW  51
+08AD:  MOVWF  4A
+08AE:  MOVLW  38
+08AF:  MOVWF  49
+08B0:  MOVLW  7C
+08B1:  MOVWF  48
+08B2:  MOVLP  00
+08B3:  CALL   1B7
+08B4:  MOVLP  08
+08B5:  MOVF   77,W
+08B6:  MOVWF  40
+08B7:  MOVF   78,W
+08B8:  MOVWF  41
+08B9:  MOVF   79,W
+08BA:  MOVWF  42
+08BB:  MOVF   7A,W
+08BC:  MOVWF  43
+08BD:  BCF    03.1
+08BE:  MOVF   43,W
+08BF:  MOVWF  47
+08C0:  MOVF   42,W
+08C1:  MOVWF  46
+08C2:  MOVF   41,W
+08C3:  MOVWF  45
+08C4:  MOVF   40,W
+08C5:  MOVWF  44
+08C6:  MOVF   3B,W
+08C7:  MOVWF  4B
+08C8:  MOVF   3A,W
+08C9:  MOVWF  4A
+08CA:  MOVF   39,W
+08CB:  MOVWF  49
+08CC:  MOVF   38,W
+08CD:  MOVWF  48
+08CE:  MOVLP  00
+08CF:  CALL   1B7
+08D0:  MOVLP  08
+08D1:  MOVF   7A,W
+08D2:  MOVWF  30
+08D3:  MOVF   79,W
+08D4:  MOVWF  2F
+08D5:  MOVF   78,W
+08D6:  MOVWF  2E
+08D7:  MOVF   77,W
+08D8:  MOVWF  2D
+.................... 				Pulse_flow = g_before_offset + bucket_flow + bucket_offset; 
+08D9:  BCF    03.1
+08DA:  MOVF   34,W
+08DB:  MOVWF  47
+08DC:  MOVF   33,W
+08DD:  MOVWF  46
+08DE:  MOVF   32,W
+08DF:  MOVWF  45
+08E0:  MOVF   31,W
+08E1:  MOVWF  44
+08E2:  MOVLW  EC
+08E3:  MOVWF  4B
+08E4:  MOVLW  51
+08E5:  MOVWF  4A
+08E6:  MOVLW  38
+08E7:  MOVWF  49
+08E8:  MOVLW  7C
+08E9:  MOVWF  48
+08EA:  MOVLP  00
+08EB:  CALL   1B7
+08EC:  MOVLP  08
+08ED:  MOVF   77,W
+08EE:  MOVWF  40
+08EF:  MOVF   78,W
+08F0:  MOVWF  41
+08F1:  MOVF   79,W
+08F2:  MOVWF  42
+08F3:  MOVF   7A,W
+08F4:  MOVWF  43
+08F5:  BCF    03.1
+08F6:  MOVF   43,W
+08F7:  MOVWF  47
+08F8:  MOVF   42,W
+08F9:  MOVWF  46
+08FA:  MOVF   41,W
+08FB:  MOVWF  45
+08FC:  MOVF   40,W
+08FD:  MOVWF  44
+08FE:  MOVF   3B,W
+08FF:  MOVWF  4B
+0900:  MOVF   3A,W
+0901:  MOVWF  4A
+0902:  MOVF   39,W
+0903:  MOVWF  49
+0904:  MOVF   38,W
+0905:  MOVWF  48
+0906:  MOVLP  00
+0907:  CALL   1B7
+0908:  MOVLP  08
+0909:  MOVF   7A,W
+090A:  MOVWF  3F
+090B:  MOVF   79,W
+090C:  MOVWF  3E
+090D:  MOVF   78,W
+090E:  MOVWF  3D
+090F:  MOVF   77,W
+0910:  MOVWF  3C
+.................... 				//printf("<2.0sec\n");////debug 
+.................... 			} 
+....................     		else if(g_tcnt_result_min >= 2){ 
+0911:  GOTO   1FD
+0912:  MOVF   2C,W
+0913:  SUBLW  01
+0914:  BTFSC  03.0
+0915:  GOTO   14F
+....................                 g_drainage_flow = g_drainage_flow + bucket_flow; 
+0916:  BCF    03.1
+0917:  MOVF   30,W
+0918:  MOVWF  47
+0919:  MOVF   2F,W
+091A:  MOVWF  46
+091B:  MOVF   2E,W
+091C:  MOVWF  45
+091D:  MOVF   2D,W
+091E:  MOVWF  44
+091F:  MOVLW  EC
+0920:  MOVWF  4B
+0921:  MOVLW  51
+0922:  MOVWF  4A
+0923:  MOVLW  38
+0924:  MOVWF  49
+0925:  MOVLW  7C
+0926:  MOVWF  48
+0927:  MOVLP  00
+0928:  CALL   1B7
+0929:  MOVLP  08
+092A:  MOVF   7A,W
+092B:  MOVWF  30
+092C:  MOVF   79,W
+092D:  MOVWF  2F
+092E:  MOVF   78,W
+092F:  MOVWF  2E
+0930:  MOVF   77,W
+0931:  MOVWF  2D
+.................... 				Pulse_flow = g_before_offset + bucket_flow; 
+0932:  BCF    03.1
+0933:  MOVF   34,W
+0934:  MOVWF  47
+0935:  MOVF   33,W
+0936:  MOVWF  46
+0937:  MOVF   32,W
+0938:  MOVWF  45
+0939:  MOVF   31,W
+093A:  MOVWF  44
+093B:  MOVLW  EC
+093C:  MOVWF  4B
+093D:  MOVLW  51
+093E:  MOVWF  4A
+093F:  MOVLW  38
+0940:  MOVWF  49
+0941:  MOVLW  7C
+0942:  MOVWF  48
+0943:  MOVLP  00
+0944:  CALL   1B7
+0945:  MOVLP  08
+0946:  MOVF   7A,W
+0947:  MOVWF  3F
+0948:  MOVF   79,W
+0949:  MOVWF  3E
+094A:  MOVF   78,W
+094B:  MOVWF  3D
+094C:  MOVF   77,W
+094D:  MOVWF  3C
+.................... 				//printf(">=2min.\n"); ////debug 
+.................... 			} 
+.................... 			else{ 
+094E:  GOTO   1FD
+.................... 				bucket_offset = (517.8 * bucket_flow) / ((float)g_tcnt_result-517.8); 
+094F:  MOVF   2B,W
+0950:  MOVWF  41
+0951:  MOVF   2A,W
+0952:  MOVWF  40
+0953:  MOVLP  00
+0954:  GOTO   2F9
+0955:  MOVLP  08
+0956:  MOVF   77,W
+0957:  MOVWF  40
+0958:  MOVF   78,W
+0959:  MOVWF  41
+095A:  MOVF   79,W
+095B:  MOVWF  42
+095C:  MOVF   7A,W
+095D:  MOVWF  43
+095E:  BSF    03.1
+095F:  MOVF   43,W
+0960:  MOVWF  47
+0961:  MOVF   42,W
+0962:  MOVWF  46
+0963:  MOVF   41,W
+0964:  MOVWF  45
+0965:  MOVF   40,W
+0966:  MOVWF  44
+0967:  MOVLW  33
+0968:  MOVWF  4B
+0969:  MOVLW  73
+096A:  MOVWF  4A
+096B:  MOVLW  01
+096C:  MOVWF  49
+096D:  MOVLW  88
+096E:  MOVWF  48
+096F:  MOVLP  00
+0970:  CALL   1B7
+0971:  MOVLP  08
+0972:  MOVLW  73
+0973:  MOVWF  43
+0974:  MOVLW  68
+0975:  MOVWF  42
+0976:  MOVLW  3A
+0977:  MOVWF  41
+0978:  MOVLW  85
+0979:  MOVWF  40
+097A:  MOVF   7A,W
+097B:  MOVWF  47
+097C:  MOVF   79,W
+097D:  MOVWF  46
+097E:  MOVF   78,W
+097F:  MOVWF  45
+0980:  MOVF   77,W
+0981:  MOVWF  44
+0982:  MOVLP  00
+0983:  GOTO   317
+0984:  MOVLP  08
+0985:  MOVF   7A,W
+0986:  MOVWF  3B
+0987:  MOVF   79,W
+0988:  MOVWF  3A
+0989:  MOVF   78,W
+098A:  MOVWF  39
+098B:  MOVF   77,W
+098C:  MOVWF  38
+.................... 				g_drainage_flow = g_drainage_flow + bucket_flow + bucket_offset; 
+098D:  BCF    03.1
+098E:  MOVF   30,W
+098F:  MOVWF  47
+0990:  MOVF   2F,W
+0991:  MOVWF  46
+0992:  MOVF   2E,W
+0993:  MOVWF  45
+0994:  MOVF   2D,W
+0995:  MOVWF  44
+0996:  MOVLW  EC
+0997:  MOVWF  4B
+0998:  MOVLW  51
+0999:  MOVWF  4A
+099A:  MOVLW  38
+099B:  MOVWF  49
+099C:  MOVLW  7C
+099D:  MOVWF  48
+099E:  MOVLP  00
+099F:  CALL   1B7
+09A0:  MOVLP  08
+09A1:  MOVF   77,W
+09A2:  MOVWF  40
+09A3:  MOVF   78,W
+09A4:  MOVWF  41
+09A5:  MOVF   79,W
+09A6:  MOVWF  42
+09A7:  MOVF   7A,W
+09A8:  MOVWF  43
+09A9:  BCF    03.1
+09AA:  MOVF   43,W
+09AB:  MOVWF  47
+09AC:  MOVF   42,W
+09AD:  MOVWF  46
+09AE:  MOVF   41,W
+09AF:  MOVWF  45
+09B0:  MOVF   40,W
+09B1:  MOVWF  44
+09B2:  MOVF   3B,W
+09B3:  MOVWF  4B
+09B4:  MOVF   3A,W
+09B5:  MOVWF  4A
+09B6:  MOVF   39,W
+09B7:  MOVWF  49
+09B8:  MOVF   38,W
+09B9:  MOVWF  48
+09BA:  MOVLP  00
+09BB:  CALL   1B7
+09BC:  MOVLP  08
+09BD:  MOVF   7A,W
+09BE:  MOVWF  30
+09BF:  MOVF   79,W
+09C0:  MOVWF  2F
+09C1:  MOVF   78,W
+09C2:  MOVWF  2E
+09C3:  MOVF   77,W
+09C4:  MOVWF  2D
+.................... 				Pulse_flow = g_before_offset + bucket_flow + bucket_offset; 
+09C5:  BCF    03.1
+09C6:  MOVF   34,W
+09C7:  MOVWF  47
+09C8:  MOVF   33,W
+09C9:  MOVWF  46
+09CA:  MOVF   32,W
+09CB:  MOVWF  45
+09CC:  MOVF   31,W
+09CD:  MOVWF  44
+09CE:  MOVLW  EC
+09CF:  MOVWF  4B
+09D0:  MOVLW  51
+09D1:  MOVWF  4A
+09D2:  MOVLW  38
+09D3:  MOVWF  49
+09D4:  MOVLW  7C
+09D5:  MOVWF  48
+09D6:  MOVLP  00
+09D7:  CALL   1B7
+09D8:  MOVLP  08
+09D9:  MOVF   77,W
+09DA:  MOVWF  40
+09DB:  MOVF   78,W
+09DC:  MOVWF  41
+09DD:  MOVF   79,W
+09DE:  MOVWF  42
+09DF:  MOVF   7A,W
+09E0:  MOVWF  43
+09E1:  BCF    03.1
+09E2:  MOVF   43,W
+09E3:  MOVWF  47
+09E4:  MOVF   42,W
+09E5:  MOVWF  46
+09E6:  MOVF   41,W
+09E7:  MOVWF  45
+09E8:  MOVF   40,W
+09E9:  MOVWF  44
+09EA:  MOVF   3B,W
+09EB:  MOVWF  4B
+09EC:  MOVF   3A,W
+09ED:  MOVWF  4A
+09EE:  MOVF   39,W
+09EF:  MOVWF  49
+09F0:  MOVF   38,W
+09F1:  MOVWF  48
+09F2:  MOVLP  00
+09F3:  CALL   1B7
+09F4:  MOVLP  08
+09F5:  MOVF   7A,W
+09F6:  MOVWF  3F
+09F7:  MOVF   79,W
+09F8:  MOVWF  3E
+09F9:  MOVF   78,W
+09FA:  MOVWF  3D
+09FB:  MOVF   77,W
+09FC:  MOVWF  3C
+.................... 				//printf("2sec< <2min.\n"); ////debug 
+.................... 			} 
+.................... 		 
+.................... 			if( Pulse_flow >= 0.3){ 
+09FD:  MOVLW  9A
+09FE:  MOVWF  43
+09FF:  MOVLW  99
+0A00:  MOVWF  42
+0A01:  MOVLW  19
+0A02:  MOVWF  41
+0A03:  MOVLW  7D
+0A04:  MOVWF  40
+0A05:  MOVF   3F,W
+0A06:  MOVWF  47
+0A07:  MOVF   3E,W
+0A08:  MOVWF  46
+0A09:  MOVF   3D,W
+0A0A:  MOVWF  45
+0A0B:  MOVF   3C,W
+0A0C:  MOVWF  44
+0A0D:  MOVLP  00
+0A0E:  CALL   3E2
+0A0F:  MOVLP  08
+0A10:  BTFSC  03.0
+0A11:  GOTO   214
+0A12:  BTFSS  03.2
+0A13:  GOTO   268
+.................... 				output_bit(Pulse,0); 
+0A14:  MOVLB  02
+0A15:  BCF    0C.2
+0A16:  MOVLB  01
+0A17:  BCF    0C.2
+.................... 				delay_ms(15); 
+0A18:  MOVLW  0F
+0A19:  MOVLB  00
+0A1A:  MOVWF  41
+0A1B:  MOVLP  00
+0A1C:  CALL   0A5
+0A1D:  MOVLP  08
+.................... 				output_bit(Pulse,1); 
+0A1E:  MOVLB  02
+0A1F:  BSF    0C.2
+0A20:  MOVLB  01
+0A21:  BCF    0C.2
+.................... 				delay_ms(20); 
+0A22:  MOVLW  14
+0A23:  MOVLB  00
+0A24:  MOVWF  41
+0A25:  MOVLP  00
+0A26:  CALL   0A5
+0A27:  MOVLP  08
+.................... 				output_bit(Pulse,0); 
+0A28:  MOVLB  02
+0A29:  BCF    0C.2
+0A2A:  MOVLB  01
+0A2B:  BCF    0C.2
+.................... 				delay_ms(15); 
+0A2C:  MOVLW  0F
+0A2D:  MOVLB  00
+0A2E:  MOVWF  41
+0A2F:  MOVLP  00
+0A30:  CALL   0A5
+0A31:  MOVLP  08
+.................... 				output_bit(Pulse,1); 
+0A32:  MOVLB  02
+0A33:  BSF    0C.2
+0A34:  MOVLB  01
+0A35:  BCF    0C.2
+.................... 				delay_ms(20); 
+0A36:  MOVLW  14
+0A37:  MOVLB  00
+0A38:  MOVWF  41
+0A39:  MOVLP  00
+0A3A:  CALL   0A5
+0A3B:  MOVLP  08
+.................... 				output_bit(Pulse,0); 
+0A3C:  MOVLB  02
+0A3D:  BCF    0C.2
+0A3E:  MOVLB  01
+0A3F:  BCF    0C.2
+.................... 				delay_ms(15); 
+0A40:  MOVLW  0F
+0A41:  MOVLB  00
+0A42:  MOVWF  41
+0A43:  MOVLP  00
+0A44:  CALL   0A5
+0A45:  MOVLP  08
+.................... 				output_bit(Pulse,1); 
+0A46:  MOVLB  02
+0A47:  BSF    0C.2
+0A48:  MOVLB  01
+0A49:  BCF    0C.2
+.................... 				 
+.................... 				g_before_offset= Pulse_flow - 0.3; 
+0A4A:  BSF    03.1
+0A4B:  MOVLB  00
+0A4C:  MOVF   3F,W
+0A4D:  MOVWF  47
+0A4E:  MOVF   3E,W
+0A4F:  MOVWF  46
+0A50:  MOVF   3D,W
+0A51:  MOVWF  45
+0A52:  MOVF   3C,W
+0A53:  MOVWF  44
+0A54:  MOVLW  9A
+0A55:  MOVWF  4B
+0A56:  MOVLW  99
+0A57:  MOVWF  4A
+0A58:  MOVLW  19
+0A59:  MOVWF  49
+0A5A:  MOVLW  7D
+0A5B:  MOVWF  48
+0A5C:  MOVLP  00
+0A5D:  CALL   1B7
+0A5E:  MOVLP  08
+0A5F:  MOVF   7A,W
+0A60:  MOVWF  34
+0A61:  MOVF   79,W
+0A62:  MOVWF  33
+0A63:  MOVF   78,W
+0A64:  MOVWF  32
+0A65:  MOVF   77,W
+0A66:  MOVWF  31
+.................... 			} 
+.................... 			else if( Pulse_flow >= 0.2 && Pulse_flow < 0.3 ){ 
+0A67:  GOTO   32B
+0A68:  MOVLW  CD
+0A69:  MOVWF  43
+0A6A:  MOVLW  CC
+0A6B:  MOVWF  42
+0A6C:  MOVLW  4C
+0A6D:  MOVWF  41
+0A6E:  MOVLW  7C
+0A6F:  MOVWF  40
+0A70:  MOVF   3F,W
+0A71:  MOVWF  47
+0A72:  MOVF   3E,W
+0A73:  MOVWF  46
+0A74:  MOVF   3D,W
+0A75:  MOVWF  45
+0A76:  MOVF   3C,W
+0A77:  MOVWF  44
+0A78:  MOVLP  00
+0A79:  CALL   3E2
+0A7A:  MOVLP  08
+0A7B:  BTFSC  03.0
+0A7C:  GOTO   27F
+0A7D:  BTFSS  03.2
+0A7E:  GOTO   2D4
+0A7F:  MOVF   3F,W
+0A80:  MOVWF  43
+0A81:  MOVF   3E,W
+0A82:  MOVWF  42
+0A83:  MOVF   3D,W
+0A84:  MOVWF  41
+0A85:  MOVF   3C,W
+0A86:  MOVWF  40
+0A87:  MOVLW  9A
+0A88:  MOVWF  47
+0A89:  MOVLW  99
+0A8A:  MOVWF  46
+0A8B:  MOVLW  19
+0A8C:  MOVWF  45
+0A8D:  MOVLW  7D
+0A8E:  MOVWF  44
+0A8F:  MOVLP  00
+0A90:  CALL   3E2
+0A91:  MOVLP  08
+0A92:  BTFSS  03.0
+0A93:  GOTO   2D4
+.................... 				output_bit(Pulse,0); 
+0A94:  MOVLB  02
+0A95:  BCF    0C.2
+0A96:  MOVLB  01
+0A97:  BCF    0C.2
+.................... 				delay_ms(15); 
+0A98:  MOVLW  0F
+0A99:  MOVLB  00
+0A9A:  MOVWF  41
+0A9B:  MOVLP  00
+0A9C:  CALL   0A5
+0A9D:  MOVLP  08
+.................... 				output_bit(Pulse,1); 
+0A9E:  MOVLB  02
+0A9F:  BSF    0C.2
+0AA0:  MOVLB  01
+0AA1:  BCF    0C.2
+.................... 				delay_ms(20); 
+0AA2:  MOVLW  14
+0AA3:  MOVLB  00
+0AA4:  MOVWF  41
+0AA5:  MOVLP  00
+0AA6:  CALL   0A5
+0AA7:  MOVLP  08
+.................... 				output_bit(Pulse,0); 
+0AA8:  MOVLB  02
+0AA9:  BCF    0C.2
+0AAA:  MOVLB  01
+0AAB:  BCF    0C.2
+.................... 				delay_ms(15); 
+0AAC:  MOVLW  0F
+0AAD:  MOVLB  00
+0AAE:  MOVWF  41
+0AAF:  MOVLP  00
+0AB0:  CALL   0A5
+0AB1:  MOVLP  08
+.................... 				output_bit(Pulse,1); 
+0AB2:  MOVLB  02
+0AB3:  BSF    0C.2
+0AB4:  MOVLB  01
+0AB5:  BCF    0C.2
+.................... 				 
+.................... 				g_before_offset= Pulse_flow - 0.2; 
+0AB6:  BSF    03.1
+0AB7:  MOVLB  00
+0AB8:  MOVF   3F,W
+0AB9:  MOVWF  47
+0ABA:  MOVF   3E,W
+0ABB:  MOVWF  46
+0ABC:  MOVF   3D,W
+0ABD:  MOVWF  45
+0ABE:  MOVF   3C,W
+0ABF:  MOVWF  44
+0AC0:  MOVLW  CD
+0AC1:  MOVWF  4B
+0AC2:  MOVLW  CC
+0AC3:  MOVWF  4A
+0AC4:  MOVLW  4C
+0AC5:  MOVWF  49
+0AC6:  MOVLW  7C
+0AC7:  MOVWF  48
+0AC8:  MOVLP  00
+0AC9:  CALL   1B7
+0ACA:  MOVLP  08
+0ACB:  MOVF   7A,W
+0ACC:  MOVWF  34
+0ACD:  MOVF   79,W
+0ACE:  MOVWF  33
+0ACF:  MOVF   78,W
+0AD0:  MOVWF  32
+0AD1:  MOVF   77,W
+0AD2:  MOVWF  31
+.................... 			} 
+.................... 			else if( Pulse_flow >= 0.1 && Pulse_flow < 0.2 ){ 
+0AD3:  GOTO   32B
+0AD4:  MOVLW  CD
+0AD5:  MOVWF  43
+0AD6:  MOVLW  CC
+0AD7:  MOVWF  42
+0AD8:  MOVLW  4C
+0AD9:  MOVWF  41
+0ADA:  MOVLW  7B
+0ADB:  MOVWF  40
+0ADC:  MOVF   3F,W
+0ADD:  MOVWF  47
+0ADE:  MOVF   3E,W
+0ADF:  MOVWF  46
+0AE0:  MOVF   3D,W
+0AE1:  MOVWF  45
+0AE2:  MOVF   3C,W
+0AE3:  MOVWF  44
+0AE4:  MOVLP  00
+0AE5:  CALL   3E2
+0AE6:  MOVLP  08
+0AE7:  BTFSC  03.0
+0AE8:  GOTO   2EB
+0AE9:  BTFSS  03.2
+0AEA:  GOTO   32B
+0AEB:  MOVF   3F,W
+0AEC:  MOVWF  43
+0AED:  MOVF   3E,W
+0AEE:  MOVWF  42
+0AEF:  MOVF   3D,W
+0AF0:  MOVWF  41
+0AF1:  MOVF   3C,W
+0AF2:  MOVWF  40
+0AF3:  MOVLW  CD
+0AF4:  MOVWF  47
+0AF5:  MOVLW  CC
+0AF6:  MOVWF  46
+0AF7:  MOVLW  4C
+0AF8:  MOVWF  45
+0AF9:  MOVLW  7C
+0AFA:  MOVWF  44
+0AFB:  MOVLP  00
+0AFC:  CALL   3E2
+0AFD:  MOVLP  08
+0AFE:  BTFSS  03.0
+0AFF:  GOTO   32B
+.................... 				output_bit(Pulse,0); 
+0B00:  MOVLB  02
+0B01:  BCF    0C.2
+0B02:  MOVLB  01
+0B03:  BCF    0C.2
+.................... 				delay_ms(15); 
+0B04:  MOVLW  0F
+0B05:  MOVLB  00
+0B06:  MOVWF  41
+0B07:  MOVLP  00
+0B08:  CALL   0A5
+0B09:  MOVLP  08
+.................... 				output_bit(Pulse,1); 
+0B0A:  MOVLB  02
+0B0B:  BSF    0C.2
+0B0C:  MOVLB  01
+0B0D:  BCF    0C.2
+.................... 				 
+.................... 				g_before_offset= Pulse_flow - 0.1; 
+0B0E:  BSF    03.1
+0B0F:  MOVLB  00
+0B10:  MOVF   3F,W
+0B11:  MOVWF  47
+0B12:  MOVF   3E,W
+0B13:  MOVWF  46
+0B14:  MOVF   3D,W
+0B15:  MOVWF  45
+0B16:  MOVF   3C,W
+0B17:  MOVWF  44
+0B18:  MOVLW  CD
+0B19:  MOVWF  4B
+0B1A:  MOVLW  CC
+0B1B:  MOVWF  4A
+0B1C:  MOVLW  4C
+0B1D:  MOVWF  49
+0B1E:  MOVLW  7B
+0B1F:  MOVWF  48
+0B20:  MOVLP  00
+0B21:  CALL   1B7
+0B22:  MOVLP  08
+0B23:  MOVF   7A,W
+0B24:  MOVWF  34
+0B25:  MOVF   79,W
+0B26:  MOVWF  33
+0B27:  MOVF   78,W
+0B28:  MOVWF  32
+0B29:  MOVF   77,W
+0B2A:  MOVWF  31
+.................... 			} 
+.................... 			 
+.................... 			else{} 
+.................... 		 
+.................... 		g_cal_flag = 0;	 
+0B2B:  CLRF   35
+.................... 		//printf("Pulse cycle= %Ldms\n", g_tcnt_result); ////debug 
+.................... 		 
+.................... 		} 
+.................... 		else{} 
+.................... 	 
+.................... 	 
+.................... 		if(g_tx_flag ==1){ 
+0B2C:  DECFSZ 26,W
+0B2D:  GOTO   344
+.................... 			printf("%5.1f\n",g_drainage_flow); 
+0B2E:  MOVLW  04
+0B2F:  MOVWF  04
+0B30:  MOVF   30,W
+0B31:  MOVWF  43
+0B32:  MOVF   2F,W
+0B33:  MOVWF  42
+0B34:  MOVF   2E,W
+0B35:  MOVWF  41
+0B36:  MOVF   2D,W
+0B37:  MOVWF  40
+0B38:  MOVLW  01
+0B39:  MOVWF  44
+0B3A:  MOVLP  00
+0B3B:  GOTO   501
+0B3C:  MOVLP  08
+0B3D:  MOVLW  0A
+0B3E:  BTFSS  11.4
+0B3F:  GOTO   33E
+0B40:  MOVLB  03
+0B41:  MOVWF  1A
+.................... 			g_tx_flag = 0; 
+0B42:  MOVLB  00
+0B43:  CLRF   26
+.................... 		} 
+.................... 		else{} 
+.................... 		 
+.................... 		if(g_drainage_flow >900){ 
+0B44:  CLRF   43
+0B45:  CLRF   42
+0B46:  MOVLW  61
+0B47:  MOVWF  41
+0B48:  MOVLW  88
+0B49:  MOVWF  40
+0B4A:  MOVF   30,W
+0B4B:  MOVWF  47
+0B4C:  MOVF   2F,W
+0B4D:  MOVWF  46
+0B4E:  MOVF   2E,W
+0B4F:  MOVWF  45
+0B50:  MOVF   2D,W
+0B51:  MOVWF  44
+0B52:  MOVLP  00
+0B53:  CALL   3E2
+0B54:  MOVLP  08
+0B55:  BTFSS  03.0
+0B56:  GOTO   35E
+.................... 			g_tcnt = 0; 
+0B57:  CLRF   25
+0B58:  CLRF   24
+.................... 			set_timer0(0); 
+0B59:  CLRF   15
+.................... 			g_drainage_flow=0.0; 
+0B5A:  CLRF   30
+0B5B:  CLRF   2F
+0B5C:  CLRF   2E
+0B5D:  CLRF   2D
+.................... 		} 
+.................... 		else{} 
+.................... 		 
+.................... 		if(g_before_offset >= 0.1){ 
+0B5E:  MOVLW  CD
+0B5F:  MOVWF  43
+0B60:  MOVLW  CC
+0B61:  MOVWF  42
+0B62:  MOVLW  4C
+0B63:  MOVWF  41
+0B64:  MOVLW  7B
+0B65:  MOVWF  40
+0B66:  MOVF   34,W
+0B67:  MOVWF  47
+0B68:  MOVF   33,W
+0B69:  MOVWF  46
+0B6A:  MOVF   32,W
+0B6B:  MOVWF  45
+0B6C:  MOVF   31,W
+0B6D:  MOVWF  44
+0B6E:  MOVLP  00
+0B6F:  CALL   3E2
+0B70:  MOVLP  08
+0B71:  BTFSC  03.0
+0B72:  GOTO   375
+0B73:  BTFSS  03.2
+0B74:  GOTO   3AA
+.................... 				delay_ms(20); 
+0B75:  MOVLW  14
+0B76:  MOVWF  41
+0B77:  MOVLP  00
+0B78:  CALL   0A5
+0B79:  MOVLP  08
+.................... 				output_bit(Pulse,0); 
+0B7A:  MOVLB  02
+0B7B:  BCF    0C.2
+0B7C:  MOVLB  01
+0B7D:  BCF    0C.2
+.................... 				delay_ms(15); 
+0B7E:  MOVLW  0F
+0B7F:  MOVLB  00
+0B80:  MOVWF  41
+0B81:  MOVLP  00
+0B82:  CALL   0A5
+0B83:  MOVLP  08
+.................... 				output_bit(Pulse,1); 
+0B84:  MOVLB  02
+0B85:  BSF    0C.2
+0B86:  MOVLB  01
+0B87:  BCF    0C.2
+.................... 				delay_ms(20); 
+0B88:  MOVLW  14
+0B89:  MOVLB  00
+0B8A:  MOVWF  41
+0B8B:  MOVLP  00
+0B8C:  CALL   0A5
+0B8D:  MOVLP  08
+.................... 				 
+.................... 				g_before_offset= g_before_offset - 0.1; 
+0B8E:  BSF    03.1
+0B8F:  MOVF   34,W
+0B90:  MOVWF  47
+0B91:  MOVF   33,W
+0B92:  MOVWF  46
+0B93:  MOVF   32,W
+0B94:  MOVWF  45
+0B95:  MOVF   31,W
+0B96:  MOVWF  44
+0B97:  MOVLW  CD
+0B98:  MOVWF  4B
+0B99:  MOVLW  CC
+0B9A:  MOVWF  4A
+0B9B:  MOVLW  4C
+0B9C:  MOVWF  49
+0B9D:  MOVLW  7B
+0B9E:  MOVWF  48
+0B9F:  MOVLP  00
+0BA0:  CALL   1B7
+0BA1:  MOVLP  08
+0BA2:  MOVF   7A,W
+0BA3:  MOVWF  34
+0BA4:  MOVF   79,W
+0BA5:  MOVWF  33
+0BA6:  MOVF   78,W
+0BA7:  MOVWF  32
+0BA8:  MOVF   77,W
+0BA9:  MOVWF  31
+.................... 		} 
+.................... 		else{} 
+.................... 			 
+.................... 		lcd_cmd(0x80);				//To the head of the 1st line 
+0BAA:  MOVLW  80
+0BAB:  MOVWF  40
+0BAC:  MOVLP  00
+0BAD:  CALL   110
+0BAE:  MOVLP  08
+.................... 		printf(lcd_data,"C= %5lu    %1umin",drainage_cnt,g_tcnt_result_min); 
+0BAF:  MOVLW  43
+0BB0:  MOVWF  4D
+0BB1:  MOVLP  00
+0BB2:  CALL   15F
+0BB3:  MOVLP  08
+0BB4:  MOVLW  3D
+0BB5:  MOVWF  4D
+0BB6:  MOVLP  00
+0BB7:  CALL   15F
+0BB8:  MOVLP  08
+0BB9:  MOVLW  20
+0BBA:  MOVWF  4D
+0BBB:  MOVLP  00
+0BBC:  CALL   15F
+0BBD:  MOVLP  08
+0BBE:  MOVLW  00
+0BBF:  MOVWF  04
+0BC0:  MOVF   37,W
+0BC1:  MOVWF  41
+0BC2:  MOVF   36,W
+0BC3:  MOVWF  40
+0BC4:  MOVLP  00
+0BC5:  CALL   5D1
+0BC6:  MOVLP  08
+0BC7:  MOVLW  9F
+0BC8:  MOVLB  03
+0BC9:  MOVWF  11
+0BCA:  MOVLW  00
+0BCB:  MOVWF  12
+0BCC:  BSF    03.0
+0BCD:  MOVLW  04
+0BCE:  MOVLB  00
+0BCF:  MOVWF  40
+0BD0:  MOVLP  00
+0BD1:  GOTO   62F
+0BD2:  MOVLP  08
+0BD3:  MOVF   2C,W
+0BD4:  MOVWF  40
+0BD5:  MOVLW  18
+0BD6:  MOVWF  41
+0BD7:  MOVLP  00
+0BD8:  GOTO   692
+0BD9:  MOVLP  08
+0BDA:  MOVLW  6D
+0BDB:  MOVWF  4D
+0BDC:  MOVLP  00
+0BDD:  CALL   15F
+0BDE:  MOVLP  08
+0BDF:  MOVLW  69
+0BE0:  MOVWF  4D
+0BE1:  MOVLP  00
+0BE2:  CALL   15F
+0BE3:  MOVLP  08
+0BE4:  MOVLW  6E
+0BE5:  MOVWF  4D
+0BE6:  MOVLP  00
+0BE7:  CALL   15F
+0BE8:  MOVLP  08
+.................... 		lcd_cmd(0xC0);				//To the head of the 2nd line 
+0BE9:  MOVLW  C0
+0BEA:  MOVWF  40
+0BEB:  MOVLP  00
+0BEC:  CALL   110
+0BED:  MOVLP  08
+.................... 		//printf(lcd_data,"Flow= %6.1fL",g_drainage_flow); 
+....................         printf(lcd_data,"%6lums %6.1fL",g_tcnt_result,g_drainage_flow); 
+0BEE:  MOVLW  01
+0BEF:  MOVWF  40
+0BF0:  MOVLW  20
+0BF1:  MOVWF  4D
+0BF2:  MOVLP  00
+0BF3:  CALL   15F
+0BF4:  MOVLP  08
+0BF5:  DECFSZ 40,F
+0BF6:  GOTO   3F0
+0BF7:  MOVLW  00
+0BF8:  MOVWF  04
+0BF9:  MOVF   2B,W
+0BFA:  MOVWF  41
+0BFB:  MOVF   2A,W
+0BFC:  MOVWF  40
+0BFD:  MOVLP  00
+0BFE:  CALL   5D1
+0BFF:  MOVLP  08
+0C00:  MOVLW  6D
+0C01:  MOVWF  4D
+0C02:  MOVLP  00
+0C03:  CALL   15F
+0C04:  MOVLP  08
+0C05:  MOVLW  73
+0C06:  MOVWF  4D
+0C07:  MOVLP  00
+0C08:  CALL   15F
+0C09:  MOVLP  08
+0C0A:  MOVLW  20
+0C0B:  MOVWF  4D
+0C0C:  MOVLP  00
+0C0D:  CALL   15F
+0C0E:  MOVLP  08
+0C0F:  MOVLW  05
+0C10:  MOVWF  04
+0C11:  MOVF   30,W
+0C12:  MOVWF  43
+0C13:  MOVF   2F,W
+0C14:  MOVWF  42
+0C15:  MOVF   2E,W
+0C16:  MOVWF  41
+0C17:  MOVF   2D,W
+0C18:  MOVWF  40
+0C19:  MOVLW  01
+0C1A:  MOVWF  44
+0C1B:  MOVLP  00
+0C1C:  GOTO   6C8
+0C1D:  MOVLP  08
+0C1E:  MOVLW  4C
+0C1F:  MOVWF  4D
+0C20:  MOVLP  00
+0C21:  CALL   15F
+0C22:  MOVLP  08
+.................... 		delay_ms(500);				//0.5sec間隔 
+0C23:  MOVLW  02
+0C24:  MOVWF  40
+0C25:  MOVLW  FA
+0C26:  MOVWF  41
+0C27:  MOVLP  00
+0C28:  CALL   0A5
+0C29:  MOVLP  08
+0C2A:  DECFSZ 40,F
+0C2B:  GOTO   425
+.................... 	} 
+0C2C:  GOTO   07F
+.................... } 
+....................  
+0C2D:  GOTO   42D
+
+Configuration Fuses:
+   Word  1: 09E2   HS NOWDT NOPUT MCLR NOPROTECT NOCPD NOBROWNOUT NOCLKOUT NOIESO NOFCMEN
+   Word  2: 0AFF   NOWRT PLL_SW STVREN BORV25 DEBUG NOLVP
+
+   Some fuses have been forced to be compatible with the ICD debugger.
