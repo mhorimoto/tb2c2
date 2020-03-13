@@ -84,6 +84,18 @@ config.iniを変更することで、room,region,order,priorityの設定を変�
 
 ### インストールの方法
 
+以下のパッケージを別途インストールする。
+
+* comet1
+* i2c-tools
+* python3-smbus
+* python3-serial
+* python3-pip
+* python3-netifaces
+* python3-setuptools
+* pip3 install --upgrade OPi.GPIO
+
+
     sudo make install
 
  詳細は、Makefileの中を見る。  

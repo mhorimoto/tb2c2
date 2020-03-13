@@ -29,10 +29,10 @@ ec     = 0.0
 i_tp   = 0
 tp     = 0.0
 
-#HOST = netifaces.ifaddresses('eth0')[netifaces.AF_INET][0]['addr']
-#ADDRESS = netifaces.ifaddresses('eth0')[netifaces.AF_INET][0]['broadcast']
-HOST = netifaces.ifaddresses('tun0')[netifaces.AF_INET][0]['addr']
-ADDRESS = netifaces.ifaddresses('tun0')[netifaces.AF_INET][0]['peer']
+HOST = netifaces.ifaddresses('eth0')[netifaces.AF_INET][0]['addr']
+ADDRESS = netifaces.ifaddresses('eth0')[netifaces.AF_INET][0]['broadcast']
+#HOST = netifaces.ifaddresses('tun0')[netifaces.AF_INET][0]['addr']
+#ADDRESS = netifaces.ifaddresses('tun0')[netifaces.AF_INET][0]['peer']
 PORT = 16520
 
 def send_UECSdata(typename,data,ip):
