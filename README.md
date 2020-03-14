@@ -104,6 +104,7 @@ config.iniを変更することで、room,region,order,priorityの設定を変�
      # pip3 install --upgrade OPi.GPIO
      # git clone https://github.com/mhorimoto/tb2c2.git
      # cd tb2c2
+     # mkdir /etc/uecs
      # make install
 
  詳細は、Makefileの中を見る。  
