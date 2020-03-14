@@ -86,6 +86,7 @@ config.iniを変更することで、room,region,order,priorityの設定を変�
 
 以下のパッケージを別途インストールする。
 
+* minicom
 * comet1
 * i2c-tools
 * python3-smbus
@@ -96,23 +97,29 @@ config.iniを変更することで、room,region,order,priorityの設定を変�
 * pip3 install --upgrade OPi.GPIO
 
 
-    sudo make install
+    # make install
 
  詳細は、Makefileの中を見る。  
  /etc/uecs/config.iniを編集する。上書きに備えて直ぐにバックアップをconfig.ini-backなどとコピーしておく。
- 
- Ambientのインストール
 
-     sudo apt install python3-pip
-     sudo apt install python3-setuptools
-     sudo pip3 install git+https://github.com/AmbientDataInc/ambient-python-lib.git
+### minicomのインストール
+
+    # apt install minicom
+    # cp minirc.* /etc/minicom
+
+ TB2は、ttyS1で192000bps。  
+ WD3は、ttyS3で9600bps。
+
+### Ambientのインストール
+
+     # pip3 install git+https://github.com/AmbientDataInc/ambient-python-lib.git
 
 ### 起動の方法
 
-    systemctl enable tb2c2
-    systemctl enable scanresponse
-    systemctl start tb2c2
-    systemctl start scanresponse
+     # systemctl enable tb2c2
+     # systemctl enable scanresponse
+     # systemctl start tb2c2
+     # systemctl start scanresponse
     
 
 ## OPi.GPIO
@@ -121,15 +128,13 @@ config.iniを変更することで、room,region,order,priorityの設定を変�
  [https://github.com/rm-hull/OPi.GPIO]
 
 
-    $ sudo apt install python-setuptools
-    $ sudo apt install python3-pip
-    $ sudo pip3 install --upgrade OPi.GPIO
+     # sudo pip3 install --upgrade OPi.GPIO
 
  今のところ、
 
-    import orangepi.one
-    from OPi import GPIO
-    GPIO.setmode(orangepi.one.BOARD)
+     import orangepi.one
+     from OPi import GPIO
+     GPIO.setmode(orangepi.one.BOARD)
 
  しか有効ではない。BCMを使ってもBOARDになるので注意。
  
