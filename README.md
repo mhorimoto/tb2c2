@@ -96,6 +96,7 @@ config.iniを変更することで、room,region,order,priorityの設定を変�
 * python3-setuptools
 * OPi.GPIO
 
+オペレーションは以下を参照。
 
      # cd work
      # apt update
