@@ -3,7 +3,7 @@
 UECSインタフェースを使って排液量データを送出するデーモン
 
 
-Version 1.42  
+Version 1.43  
 horimoto@holly-linux.com
 
 Python3で動作する。
@@ -94,9 +94,15 @@ config.iniを変更することで、room,region,order,priorityの設定を変�
 * python3-pip
 * python3-netifaces
 * python3-setuptools
-* pip3 install --upgrade OPi.GPIO
+* OPi.GPIO
 
 
+    # cd work
+    # apt update
+    # apt install i2c-tools python3-smbus python3-serial python3-netifaces python3-pip python3-setuptools
+    # pip3 install --upgrade OPi.GPIO
+    # git clone https://github.com/mhorimoto/tb2c2.git
+    # cd tb2c2
     # make install
 
  詳細は、Makefileの中を見る。  
@@ -127,8 +133,6 @@ config.iniを変更することで、room,region,order,priorityの設定を変�
  RPiで使われているRPi.GPIOのOrangePi版。
  [https://github.com/rm-hull/OPi.GPIO]
 
-
-     # sudo pip3 install --upgrade OPi.GPIO
 
  今のところ、
 
