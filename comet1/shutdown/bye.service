@@ -1,0 +1,13 @@
+[Unit]
+Description=Output LCD going to be shutdown
+Before=shutdown.target
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/bye.sh
+RemainAfterExit=true
+
+[Install]
+WantedBy=shutdown.target
+
