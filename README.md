@@ -97,13 +97,13 @@ config.iniを変更することで、room,region,order,priorityの設定を変�
 * OPi.GPIO
 
 
-    # cd work
-    # apt update
-    # apt install i2c-tools python3-smbus python3-serial python3-netifaces python3-pip python3-setuptools
-    # pip3 install --upgrade OPi.GPIO
-    # git clone https://github.com/mhorimoto/tb2c2.git
-    # cd tb2c2
-    # make install
+     # cd work
+     # apt update
+     # apt install i2c-tools python3-smbus python3-serial python3-netifaces python3-pip python3-setuptools
+     # pip3 install --upgrade OPi.GPIO
+     # git clone https://github.com/mhorimoto/tb2c2.git
+     # cd tb2c2
+     # make install
 
  詳細は、Makefileの中を見る。  
  /etc/uecs/config.iniを編集する。上書きに備えて直ぐにバックアップをconfig.ini-backなどとコピーしておく。
