@@ -87,6 +87,7 @@ config.iniを変更することで、room,region,order,priorityの設定を変�
 以下のパッケージを別途インストールする。
 
 * minicom
+* ntp
 * comet1
 * i2c-tools
 * python3-smbus
@@ -100,7 +101,7 @@ config.iniを変更することで、room,region,order,priorityの設定を変�
 
      # cd work
      # apt update
-     # apt install i2c-tools python3-smbus python3-serial python3-netifaces python3-pip python3-setuptools
+     # apt install i2c-tools python3-smbus python3-serial python3-netifaces python3-pip python3-setuptools ntp
      # pip3 install --upgrade OPi.GPIO
      # git clone https://github.com/mhorimoto/tb2c2.git
      # cd tb2c2
