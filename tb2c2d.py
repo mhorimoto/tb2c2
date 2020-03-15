@@ -1,7 +1,7 @@
 #! /usr/bin/python3
 #coding: utf-8
 #
-Version="1.43"
+Version="1.44"
 #
 import os
 import signal
@@ -19,6 +19,7 @@ tb2initok = True
 tb2ok     = True
 wd3initok = True
 wd3ok     = True
+wd3present= True
 
 i_tb2v = 0
 f_ans  = 0.0
@@ -58,6 +59,9 @@ ambflag = False
 if 'Ambient' in config:
     if ('chid' in config['Ambient']) and ('wrkey' in config['Ambient']):
         ambflag = True
+if ('wd3present' in config['NODE']):
+    wd3present = config['NODE'].getboolean('wd3present')
+#    print("wd3preset:{0}".format(wd3present))
 
 lcd.lcd_init()
 prevsec = 0
@@ -110,8 +114,16 @@ except serial.serialutil.SerialException:
 #
 #  WD-3 port initilize
 #
-wd3 = wd3init()
-
+if wd3present:
+#    print("WD3 init")
+    wd3 = wd3init()
+    if (wd3==False):
+        wd3initok = False
+    else:
+        wd3initok = True
+else:
+#    print("WD3 NOT Preset")
+    wd3initok = False
 #
 #  Ambient initilize
 #
@@ -166,66 +178,69 @@ while(True):
         #
         # Read data from WD-3
         #
-        if wd3initok:
-            D2.write("1")
-            D2.flush()
-            wd3.write("D".encode())
-            ans = wd3.readline().decode()
-            chkans = ans[0:2]
-            if chkans=='DW':
-                wd3ok = True
-                D2.write("0")
-                D2.flush()
-            else:
-                wd3ok = False
-                print(chkans)
-                emsg = "WD3init ERR {0}".format(chkans)
-                lcd.lcd_string(emsg,lcd.LCD_LINE_1)
+        if wd3present:
+            if wd3initok:
                 D2.write("1")
                 D2.flush()
-            if wd3ok:
-                D2.write("0")
-                D2.flush()
-                # DW=1.000,E=0.009,T=0.482E1 <== Responsed TEXT
+                wd3.write("D".encode())
+                ans = wd3.readline().decode()
+                chkans = ans[0:2]
+                if chkans=='DW':
+                    wd3ok = True
+                    D2.write("0")
+                    D2.flush()
+                else:
+                    wd3ok = False
+                    print(chkans)
+                    emsg = "WD3init ERR {0}".format(chkans)
+                    lcd.lcd_string(emsg,lcd.LCD_LINE_1)
+                    D2.write("1")
+                    D2.flush()
+                if wd3ok:
+                    D2.write("0")
+                    D2.flush()
+                    # DW=1.000,E=0.009,T=0.482E1 <== Responsed TEXT
 
-                #
-                # Calculate for WD-3 VWC
-                #
-                wv = ans[3:8]
-                wf = float(wv)
-                vwc = wf * 100
-                i_vwc = int((vwc+0.05)*10)
-                #
-                # Calculate for WD-3 EC
-                #
-                ev = ans[11:16]
-                ef = float(ev)
-                ec = ef / 0.1428
-                i_ec = int((ec+0.005)*100)
-                #
-                # Calculate for WD-3 Temperature
-                #
-                tv = ans[19:24]
-                tf = float(tv)
-                tp = tf / 0.02 - 10.0
-                i_tp = int((tp+0.05)*10)
+                    #
+                    # Calculate for WD-3 VWC
+                    #
+                    wv = ans[3:8]
+                    wf = float(wv)
+                    vwc = wf * 100
+                    i_vwc = int((vwc+0.05)*10)
+                    #
+                    # Calculate for WD-3 EC
+                    #
+                    ev = ans[11:16]
+                    ef = float(ev)
+                    ec = ef / 0.1428
+                    i_ec = int((ec+0.005)*100)
+                    #
+                    # Calculate for WD-3 Temperature
+                    #
+                    tv = ans[19:24]
+                    tf = float(tv)
+                    tp = tf / 0.02 - 10.0
+                    i_tp = int((tp+0.05)*10)
+                else:
+                    i_vwc = -100
+                    i_tp = 990
+                    i_ec = 9999
             else:
-                i_vwc = -100
-                i_tp = 990
-                i_ec = 9999
-        else:
-            D2.write("1")
-            D2.flush()
-            emsg = "WD3 ERROR"
-            print(emsg)
-            lcd.lcd_string(emsg,lcd.LCD_LINE_1)
+                D2.write("1")
+                D2.flush()
+                emsg = "WD3 ERROR"
+                print(emsg)
+                lcd.lcd_string(emsg,lcd.LCD_LINE_1)
 
         D3.write("1")
         D3.flush()
         send_UECSdata("FLOW.mNB",i_tb2v,HOST)
-        send_UECSdata("VWC.mNB",i_vwc,HOST)
-        send_UECSdata("EC.mNB",i_ec,HOST)
-        send_UECSdata("TEMP.mNB",i_tp,HOST)
+        if wd3present:
+            send_UECSdata("VWC.mNB",i_vwc,HOST)
+            send_UECSdata("EC.mNB",i_ec,HOST)
+            send_UECSdata("TEMP.mNB",i_tp,HOST)
+
         if ambflag:
             amr = am.send({'d1': f_ans, 'd2': vwc, 'd3': ec, 'd4': tp})
         D3.write("0")
@@ -240,30 +255,49 @@ while(True):
     elif (a.second>30):
         lcd.lcd_string(ip,lcd.LCD_LINE_2)
     elif (a.second>20):
-        l = lcd.LCD_LINE_1
-        a1 = f_ans
-        a2 = vwc
-        u = "TB:{0:4.1f} VWC:{1:4.1f}".format(a1,a2)
-        lcd.lcd_string(u,l)
-        l = lcd.LCD_LINE_2
-        a1 = ec
-        a2 = tp
-        u = "EC:{0:4.2f} TP:{1:4.1f}".format(a1,a2)
-        lcd.lcd_string(u,l)
+        if wd3present:
+            l = lcd.LCD_LINE_1
+            a1 = f_ans
+            a2 = vwc
+            u = "TB:{0:4.1f} VWC:{1:4.1f}".format(a1,a2)
+            lcd.lcd_string(u,l)
+            l = lcd.LCD_LINE_2
+            a1 = ec
+            a2 = tp
+            u = "EC:{0:4.2f} TP:{1:4.1f}".format(a1,a2)
+            lcd.lcd_string(u,l)
+        else:
+            l = lcd.LCD_LINE_1
+            a1 = f_ans
+            u = "TB:{0:4.1f}            ".format(a1)
+            lcd.lcd_string(u,l)
+            l = lcd.LCD_LINE_2
+            u = "WD3 NOT PRESENT "
+            lcd.lcd_string(u,l)
+
     elif (a.second>10):
         lcd.lcd_string(ip,lcd.LCD_LINE_2)
     else:
-        l = lcd.LCD_LINE_1
-        a1 = f_ans
-        a2 = vwc
-        u = "TB:{0:4.1f} VWC:{1:4.1f}".format(a1,a2)
-        lcd.lcd_string(u,l)
-        l = lcd.LCD_LINE_2
-        a1 = ec
-        a2 = tp
-        u = "EC:{0:4.2f} TP:{1:4.1f}".format(a1,a2)
-        lcd.lcd_string(u,l)
-        
+        if wd3present:
+            l = lcd.LCD_LINE_1
+            a1 = f_ans
+            a2 = vwc
+            u = "TB:{0:4.1f} VWC:{1:4.1f}".format(a1,a2)
+            lcd.lcd_string(u,l)
+            l = lcd.LCD_LINE_2
+            a1 = ec
+            a2 = tp
+            u = "EC:{0:4.2f} TP:{1:4.1f}".format(a1,a2)
+            lcd.lcd_string(u,l)
+        else:
+            l = lcd.LCD_LINE_1
+            a1 = f_ans
+            u = "TB:{0:4.1f}            ".format(a1)
+            lcd.lcd_string(u,l)
+            l = lcd.LCD_LINE_2
+            u = "WD3 NOT PRESENT "
+            lcd.lcd_string(u,l)
+
     prevsec = a.second
     time.sleep(1)
     send_UECSdata("cnd.mNB",0,HOST)
