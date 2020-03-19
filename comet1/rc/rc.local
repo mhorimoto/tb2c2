@@ -10,7 +10,7 @@
 # bits.
 #
 # By default this script does nothing.
-
+/sbin/sysctl -p
 for i in `seq 1 60`;
 do
     _IP=$(hostname -I)||true
