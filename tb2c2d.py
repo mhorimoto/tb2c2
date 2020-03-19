@@ -38,7 +38,7 @@ PORT = 16520
 
 def send_UECSdata(typename,data,ip):
     room     = config[typename]['room']
-7    region   = config[typename]['region']
+    region   = config[typename]['region']
     order    = config[typename]['order']
     priority = config[typename]['priority']
     s = socket(AF_INET,SOCK_DGRAM)
