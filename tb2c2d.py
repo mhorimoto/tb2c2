@@ -1,7 +1,7 @@
 #! /usr/bin/python3
 #coding: utf-8
 #
-Version="1.44"
+Version="1.45"
 #
 import os
 import signal
@@ -38,7 +38,7 @@ PORT = 16520
 
 def send_UECSdata(typename,data,ip):
     room     = config[typename]['room']
-    region   = config[typename]['region']
+7    region   = config[typename]['region']
     order    = config[typename]['order']
     priority = config[typename]['priority']
     s = socket(AF_INET,SOCK_DGRAM)
@@ -235,11 +235,11 @@ while(True):
 
         D3.write("1")
         D3.flush()
-        send_UECSdata("FLOW.mNB",i_tb2v,HOST)
+        send_UECSdata("FLOW.mNB",f_ans,HOST)
         if wd3present:
-            send_UECSdata("VWC.mNB",i_vwc,HOST)
-            send_UECSdata("EC.mNB",i_ec,HOST)
-            send_UECSdata("TEMP.mNB",i_tp,HOST)
+            send_UECSdata("VWC.mNB",vwc,HOST)
+            send_UECSdata("EC.mNB",ec,HOST)
+            send_UECSdata("TEMP.mNB",tp,HOST)
 
         if ambflag:
             amr = am.send({'d1': f_ans, 'd2': vwc, 'd3': ec, 'd4': tp})
