@@ -144,4 +144,10 @@ config.iniを変更することで、room,region,order,priorityの設定を変�
      GPIO.setmode(orangepi.one.BOARD)
 
  しか有効ではない。BCMを使ってもBOARDになるので注意。
- 
+
+## crontabの設定
+
+TB2のリセットを行うために以下の設定をcrontabに施す。
+
+    MAILTO=""
+    0 0 * * * touch /tmp/tb2-zero
