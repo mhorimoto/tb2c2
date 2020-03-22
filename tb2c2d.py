@@ -1,7 +1,7 @@
 #! /usr/bin/python3
 #coding: utf-8
 #
-Version="1.45"
+Version="1.45gis"
 #
 import os
 import signal
@@ -14,6 +14,9 @@ import netifaces
 from wd3init import wd3init
 from socket import *
 import ambient
+import uuid
+import urllib.parse
+import urllib.request
 
 tb2initok = True
 tb2ok     = True
@@ -36,6 +39,8 @@ ADDRESS = netifaces.ifaddresses('eth0')[netifaces.AF_INET][0]['broadcast']
 #ADDRESS = netifaces.ifaddresses('tun0')[netifaces.AF_INET][0]['peer']
 PORT = 16520
 
+###################################################
+
 def send_UECSdata(typename,data,ip):
     room     = config[typename]['room']
     region   = config[typename]['region']
@@ -50,6 +55,28 @@ def send_UECSdata(typename,data,ip):
     s.sendto(ut.encode(),(ADDRESS,PORT))
     s.close()
 
+def send_GISdata(m,i,p,v,u):
+    gisval = {}
+    gisval = {'M':m,'I':i,'P':p,'V':v}
+    params = urllib.parse.urlencode(gisval)
+    params = params.encode('ascii')
+    #print(params)
+    urlreq = urllib.request.Request(u,params)
+    with urllib.request.urlopen(urlreq) as urlresponse:
+        the_page = urlresponse.read()
+
+
+def getMACAddress():
+    devid = uuid.getnode()
+    mac1 = (devid >> 40) & 0xff
+    mac2 = (devid >> 32) & 0xff
+    mac3 = (devid >> 24) & 0xff
+    mac4 = (devid >> 16) & 0xff
+    mac5 = (devid >> 8 ) & 0xff
+    mac6 = devid & 0xff
+    maca =  "%02x:%02x:%02x:%02x:%02x:%02x" % ( mac1,mac2,mac3,mac4,mac5,mac6)
+    return maca
+
 ###################################################
 
 config = configparser.ConfigParser()
@@ -63,6 +90,12 @@ if ('wd3present' in config['NODE']):
     wd3present = config['NODE'].getboolean('wd3present')
 #    print("wd3preset:{0}".format(wd3present))
 
+gisflag = False
+if 'gis' in config:
+    if ('url' in config['gis']) and ('sensid' in config['gis']):
+        gisflag = True
+        MACADDR = getMACAddress()
+        
 lcd.lcd_init()
 prevsec = 0
 ip = HOST
@@ -240,9 +273,22 @@ while(True):
             send_UECSdata("VWC.mNB",vwc,HOST)
             send_UECSdata("EC.mNB",ec,HOST)
             send_UECSdata("TEMP.mNB",tp,HOST)
+        if gisflag:
+            sensid = config['gis']['sensid']
+            url = config['gis']['url']
+            send_GISdata(MACADDR,sensid,config['gis']['tb2p']   ,i_tb2v,url)
+            if wd3present:
+                send_GISdata(MACADDR,sensid,config['gis']['wd3vwc'] ,i_vwc ,url)
+                send_GISdata(MACADDR,sensid,config['gis']['wd3ec']  ,i_ec  ,url)
+                send_GISdata(MACADDR,sensid,config['gis']['wd3temp'],i_tp  ,url)
 
         if ambflag:
-            amr = am.send({'d1': f_ans, 'd2': vwc, 'd3': ec, 'd4': tp})
+            try:
+                amr = am.send({'d1': f_ans, 'd2': vwc, 'd3': ec, 'd4': tp})
+                #print("AMB OK")
+            except ConnectionError:
+                #print("AMB Conn Error.")
+                pass
         D3.write("0")
         D3.flush()
 
@@ -301,3 +347,5 @@ while(True):
     prevsec = a.second
     time.sleep(1)
     send_UECSdata("cnd.mNB",0,HOST)
+
+#######################################################################
