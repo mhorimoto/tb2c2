@@ -3,13 +3,14 @@
 UECSインタフェースを使って排液量データを送出するデーモン
 
 
-Version 1.43  
+Version 1.50  
 horimoto@holly-linux.com
 
 Python3で動作する。
 
 1.42はAmbient対応している。/etc/uecs/config.iniにAmbient設定を書き込むことでAmbientにもデータを送り出す。
 
+1.50から、GIS10に対応している。/etc/uecs/config.iniにgis設定を書き込むことでGIS10サーバにデータを送り出す。
 
 ## 必要なモジュール
 
@@ -19,6 +20,9 @@ Python3で動作する。
  * import configparser
  * import netifaces
  * import smbus
+ * import uuid
+ * import urllib.parse
+ * import urllib.request
  * from socket import *
  * OPi.GPIO (後述する)
  
@@ -80,7 +84,14 @@ config.iniを変更することで、room,region,order,priorityの設定を変�
     [Ambient]
     chid = 1***9
     wrkey = 5***55a2***682a7
-
+    
+    [gis]
+    url = http://farmem.holly-linux.com:9980/rxdata.php
+    sensid    = 1
+    tb2p      = 61445
+    wd3vwc    = 61448
+    wd3ec     = 61449
+    wd3temp   = 61450
 
 ### インストールの方法
 
@@ -151,3 +162,7 @@ TB2のリセットを行うために以下の設定をcrontabに施す。
 
     MAILTO=""
     0 0 * * * touch /tmp/tb2-zero
+
+## GIS10の設定
+
+要相談

@@ -1,7 +1,7 @@
 #! /usr/bin/python3
 #coding: utf-8
 #
-Version="1.45gis"
+Version="1.50"
 #
 import os
 import signal
