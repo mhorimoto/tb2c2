@@ -3,7 +3,7 @@
 UECSインタフェースを使って排液量データを送出するデーモン
 
 
-Version 1.50  
+Version 1.51  
 horimoto@holly-linux.com
 
 Python3で動作する。

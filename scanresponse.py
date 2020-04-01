@@ -1,6 +1,6 @@
 #! /usr/bin/python3
 #coding: utf-8
-# Version 1.30
+# Version 1.40
 #
 import datetime
 import time
@@ -51,7 +51,7 @@ class ServerThread(threading.Thread):
 
                 if ( sp == 'NODESCAN' ):
                     self.sdata = "{0}{1}<NODE><NAME>{2}</NAME><VENDER>{3}</VENDER>"\
-                                 "<UECSID>{4}</UECSID><IP>{5}</IP><MAC>{6}</MAC></UECS>".\
+                                 "<UECSID>{4}</UECSID><IP>{5}</IP><MAC>{6}</MAC></NODE></UECS>".\
                                  format(XML_HEADER,UECS_HEADER,config['NODE']['name'],config['NODE']['vender'],\
                                         config['NODE']['uecsid'],self.ipaddress,self.macaddr)
                     self.udpServSock.sendto(self.sdata.encode('utf-8'),self.addr)
