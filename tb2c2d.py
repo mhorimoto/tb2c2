@@ -1,7 +1,7 @@
 #! /usr/bin/python3
 #coding: utf-8
 #
-Version="1.51"
+Version="1.51A"
 #
 import os
 import signal
@@ -282,24 +282,28 @@ while(True):
                 send_GISdata(MACADDR,sensid,config['gis']['wd3ec']  ,i_ec  ,url)
                 send_GISdata(MACADDR,sensid,config['gis']['wd3temp'],i_tp  ,url)
 
-        if ambflag:
-            try:
-                amr = am.send({'d1': f_ans, 'd2': vwc, 'd3': ec, 'd4': tp})
-                #print("AMB OK")
-            except ConnectionError:
-                #print("AMB Conn Error.")
-                pass
+        if ((a.minute % 5)==0):
+            if ambflag:
+                try:
+                    amr = am.send({'d1': f_ans, 'd2': vwc, 'd3': ec, 'd4': tp})
+                    #print("AMB OK")
+                except ConnectionError:
+                    #print("AMB Conn Error.")
+                    pass
         D3.write("0")
         D3.flush()
 
 #######################################################        
     if (a.second>50):
-        lcd.lcd_string(ip,lcd.LCD_LINE_2)
+        #lcd.lcd_string(ip,lcd.LCD_LINE_2)
+        pass
     elif (a.second>40):
-        msg = "UECS TB2C2 V{0}".format(Version)
-        lcd.lcd_string(msg,lcd.LCD_LINE_2)
+        pass
+        #msg = "UECS TB2C2 V{0}".format(Version)
+        #lcd.lcd_string(msg,lcd.LCD_LINE_2)
     elif (a.second>30):
-        lcd.lcd_string(ip,lcd.LCD_LINE_2)
+        pass
+        #lcd.lcd_string(ip,lcd.LCD_LINE_2)
     elif (a.second>20):
         if wd3present:
             l = lcd.LCD_LINE_1
@@ -322,7 +326,8 @@ while(True):
             lcd.lcd_string(u,l)
 
     elif (a.second>10):
-        lcd.lcd_string(ip,lcd.LCD_LINE_2)
+        pass
+        #lcd.lcd_string(ip,lcd.LCD_LINE_2)
     else:
         if wd3present:
             l = lcd.LCD_LINE_1
