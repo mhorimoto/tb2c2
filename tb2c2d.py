@@ -1,7 +1,7 @@
 #! /usr/bin/python3
 #coding: utf-8
 #
-Version="1.51A"
+Version="1.52A"
 #
 import os
 import signal
