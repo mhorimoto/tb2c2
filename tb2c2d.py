@@ -13,7 +13,7 @@ import configparser
 import netifaces
 from wd3init import wd3init
 from socket import *
-import ambient
+#import ambient
 import uuid
 import urllib.parse
 import urllib.request
@@ -161,6 +161,7 @@ else:
 #  Ambient initilize
 #
 if ambflag:
+    import ambient
     am = ambient.Ambient(config['Ambient']['chid'],config['Ambient']['wrkey'])
 
 while(True):
