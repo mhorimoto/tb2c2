@@ -372,6 +372,16 @@ while(True):
                 u = "RESETING"
                 lcd.lcd_string(u,l)
                 sw2delay += 1
+        if (sw3s==0):  # if VERSION/IP DISPLAY
+            sw1delay = 0
+            sw2delay = 0
+            l = lcd.LCD_LINE_1
+            u = "TB2C2 VER:{0}".format(Version)
+            lcd.lcd_string(u,l)
+            l = lcd.LCD_LINE_2
+            u = "{0}".format(ip)
+            lcd.lcd_string(u,l)
+            
         else:
             l = lcd.LCD_LINE_2
             u = "BUTTON PUSH"
