@@ -1,9 +1,10 @@
 #! /usr/bin/python3
 #coding: utf-8
 #
-Version="1.52A"
+Version="1.53"
 #
 import os
+import subprocess
 import signal
 import lcd_i2c as lcd
 import datetime
@@ -13,7 +14,6 @@ import configparser
 import netifaces
 from wd3init import wd3init
 from socket import *
-#import ambient
 import uuid
 import urllib.parse
 import urllib.request
@@ -23,6 +23,15 @@ tb2ok     = True
 wd3initok = True
 wd3ok     = True
 wd3present= True
+#
+# Switch previous status
+#
+sw1ps     = 1
+sw2ps     = 1
+sw3ps     = 1
+sw1delay  = 0
+sw2delay  = 0
+sw3delay  = 0
 
 i_tb2v = 0
 f_ans  = 0.0
@@ -101,14 +110,59 @@ prevsec = 0
 ip = HOST
 
 #
-#  D2,D3 initialize
+#  GPIO common directories
 #
 GPIO="/sys/class/gpio"
 GPIOEXPORT=GPIO+"/export"
+#
+#  SW1(PC4),SW2(SA6),SW3(PC7) initialize
+#
+SW1D = "/sys/class/gpio/gpio71"
+SW2D = "/sys/class/gpio/gpio6"
+SW3D = "/sys/class/gpio/gpio68"
+
+DOUT = open(GPIOEXPORT,"w")
+
+if os.path.isdir(SW1D):
+    pass
+else:
+    DOUT.write("71")
+    DOUT.flush()
+if os.path.isdir(SW2D):
+    pass
+else:
+    DOUT.write("06")
+    DOUT.flush()
+if os.path.isdir(SW3D):
+    pass
+else:
+    DOUT.write("68")
+    DOUT.flush()
+
+DOUT.close()
+
+DOUT = open(SW1D+"/direction","w")
+DOUT.write("in")
+DOUT.close()
+DOUT = open(SW2D+"/direction","w")
+DOUT.write("in")
+DOUT.close()
+DOUT = open(SW3D+"/direction","w")
+DOUT.write("in")
+DOUT.close()
+SW1 = open(SW1D+"/value","r")
+SW2 = open(SW2D+"/value","r")
+SW3 = open(SW3D+"/value","r")
+
+
+#
+#  D2,D3 initialize
+#
 GPIO10="/sys/class/gpio/gpio10"
 GPIO20="/sys/class/gpio/gpio20"
 
 DOUT = open(GPIOEXPORT,"w")
+
 if os.path.isdir(GPIO10):
     pass
 else:
@@ -294,7 +348,35 @@ while(True):
         D3.write("0")
         D3.flush()
 
-#######################################################        
+#######################################################
+    with open(SW1D+"/value","r") as SW1:
+        sw1s = int(SW1.read())
+    with open(SW2D+"/value","r") as SW2:
+        sw2s = int(SW2.read())
+    with open(SW3D+"/value","r") as SW3:
+        sw3s = int(SW3.read())
+    btnsts = sw1s * sw2s * sw3s  # ボタンが1個でも0ならばbtnstsは0
+    if (btnsts==0):
+        if (sw2s==0):  # if RESET
+            sw1delay = 0
+            sw3delay = 0
+            if (sw2delay>5):
+                l = lcd.LCD_LINE_2
+                u = "RESET DONE"
+                lcd.lcd_string(u,l)
+                cmd = ["/sbin/reboot"]
+                subprocess.run(cmd)
+                sw2delay = 0
+            else:
+                l = lcd.LCD_LINE_2
+                u = "RESETING"
+                lcd.lcd_string(u,l)
+                sw2delay += 1
+        else:
+            l = lcd.LCD_LINE_2
+            u = "BUTTON PUSH"
+            lcd.lcd_string(u,l)
+
     if (a.second>50):
         #lcd.lcd_string(ip,lcd.LCD_LINE_2)
         pass
@@ -315,16 +397,18 @@ while(True):
             l = lcd.LCD_LINE_2
             a1 = ec
             a2 = tp
-            u = "EC:{0:4.2f} TP:{1:4.1f}".format(a1,a2)
-            lcd.lcd_string(u,l)
+            if (btnsts==1):
+                u = "EC:{0:4.2f} TP:{1:4.1f}".format(a1,a2)
+                lcd.lcd_string(u,l)
         else:
             l = lcd.LCD_LINE_1
             a1 = f_ans
             u = "TB:{0:4.1f}            ".format(a1)
             lcd.lcd_string(u,l)
             l = lcd.LCD_LINE_2
-            u = "WD3 NOT PRESENT "
-            lcd.lcd_string(u,l)
+            if (btnsts==1):
+                u = "WD3 NOT PRESENT "
+                lcd.lcd_string(u,l)
 
     elif (a.second>10):
         pass
@@ -339,19 +423,21 @@ while(True):
             l = lcd.LCD_LINE_2
             a1 = ec
             a2 = tp
-            u = "EC:{0:4.2f} TP:{1:4.1f}".format(a1,a2)
-            lcd.lcd_string(u,l)
+            if (btnsts==1):
+                u = "EC:{0:4.2f} TP:{1:4.1f}".format(a1,a2)
+                lcd.lcd_string(u,l)
         else:
             l = lcd.LCD_LINE_1
             a1 = f_ans
             u = "TB:{0:4.1f}            ".format(a1)
             lcd.lcd_string(u,l)
             l = lcd.LCD_LINE_2
-            u = "WD3 NOT PRESENT "
-            lcd.lcd_string(u,l)
+            if (btnsts==1):
+                u = "WD3 NOT PRESENT "
+                lcd.lcd_string(u,l)
 
     prevsec = a.second
     time.sleep(1)
     send_UECSdata("cnd.mNB",0,HOST)
-
+    
 #######################################################################

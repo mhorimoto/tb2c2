@@ -3,7 +3,7 @@
 UECSインタフェースを使って排液量データを送出するデーモン
 
 
-Version 1.51  
+Version 1.53  
 horimoto@holly-linux.com
 
 Python3で動作する。
@@ -11,6 +11,14 @@ Python3で動作する。
 1.42はAmbient対応している。/etc/uecs/config.iniにAmbient設定を書き込むことでAmbientにもデータを送り出す。
 
 1.50から、GIS10に対応している。/etc/uecs/config.iniにgis設定を書き込むことでGIS10サーバにデータを送り出す。
+
+1.53から、ボタンを部分的に有効化した。
+左から
+
+ * PICのReset (!MCLR)
+ * OPi Reset (SW2-SA6)
+ * 予約 (SW3-PC4)
+ * OPi Shutdown (SW1-PC7)
 
 ## 必要なモジュール
 
