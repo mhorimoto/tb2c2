@@ -120,19 +120,35 @@ config.iniを変更することで、room,region,order,priorityの設定を変�
 
      # cd work
      # apt update
-     # apt install i2c-tools python3-smbus python3-serial python3-netifaces python3-pip python3-setuptools ntp
+     # apt install i2c-tools python3-smbus python3-serial python3-netifaces python3-pip python3-setuptools ntp minicom emacs-nox
      # pip3 install --upgrade OPi.GPIO
      # git clone https://github.com/mhorimoto/tb2c2.git
      # cd tb2c2
+     # cd comet1
+     # cd lcd      # LCD関連プログラムのインストール
+     # ./install.sh
+       このあと、/usr/local/bin/lcd_i2c.pyのI2Cアドレスを必要に応じて編集する。
+     # cd ../rc
+     # ./install.sh
+     # cd ../shutdown
+     # ./install.sh
+     # systemctl enable bye.service
+     # cd ..
      # mkdir /etc/uecs
      # make install
+     # crontab -e
+       以下の2行を追記する。
+       MAILTO=""
+       0 0 * * * touch /tmp/tb2-zero
+
 
  詳細は、Makefileの中を見る。  
  /etc/uecs/config.iniを編集する。上書きに備えて直ぐにバックアップをconfig.ini-backなどとコピーしておく。
 
+
 ### minicomのインストール
 
-    # apt install minicom
+    # apt install minicom       # 上で実施済ならば不要
     # cp minirc.* /etc/minicom
 
  TB2は、ttyS1で192000bps。  
