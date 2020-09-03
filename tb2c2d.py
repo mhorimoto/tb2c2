@@ -1,7 +1,7 @@
 #! /usr/bin/python3
 #coding: utf-8
 #
-Version="1.53"
+Version="1.53A"
 #
 import os
 import subprocess
@@ -357,6 +357,21 @@ while(True):
         sw3s = int(SW3.read())
     btnsts = sw1s * sw2s * sw3s  # ボタンが1個でも0ならばbtnstsは0
     if (btnsts==0):
+        if (sw1s==0):  # if SHUTDOWN
+            sw2delay = 0
+            sw3delay = 0
+            if (sw1delay>5):
+                l = lcd.LCD_LINE_2
+                u = "SHUTDOWN NOW"
+                lcd.lcd_string(u,l)
+                cmd = ["/sbin/shutdown -h now"]
+                subprocess.run(cmd)
+                sw1delay = 0
+            else:
+                l = lcd.LCD_LINE_2
+                u = "SHUTDOWN?"
+                lcd.lcd_string(u,l)
+                sw1delay += 1
         if (sw2s==0):  # if RESET
             sw1delay = 0
             sw3delay = 0
@@ -382,10 +397,6 @@ while(True):
             u = "{0}".format(ip)
             lcd.lcd_string(u,l)
             
-        else:
-            l = lcd.LCD_LINE_2
-            u = "BUTTON PUSH"
-            lcd.lcd_string(u,l)
 
     if (a.second>50):
         #lcd.lcd_string(ip,lcd.LCD_LINE_2)
