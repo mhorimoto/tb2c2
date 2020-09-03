@@ -364,7 +364,7 @@ while(True):
                 l = lcd.LCD_LINE_2
                 u = "SHUTDOWN NOW"
                 lcd.lcd_string(u,l)
-                cmd = ["/sbin/shutdown -h now"]
+                cmd = ["/sbin/shutdown","-h","now"]
                 subprocess.run(cmd)
                 sw1delay = 0
             else:
