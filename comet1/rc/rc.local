@@ -13,6 +13,7 @@
 /sbin/sysctl -p
 for i in `seq 1 60`;
 do
+    /sbin/sysctl -p
     _IP=$(hostname -I)||true
     if [ "$_IP" = "" ]; then
 	sleep 2
