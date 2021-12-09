@@ -16,9 +16,9 @@ Python3で動作する。
 左から
 
  * PICのReset (!MCLR)
- * OPi Reset (SW2-SA6)
- * 予約 (SW3-PC4)
- * OPi Shutdown (SW1-PC7)
+ * OPi Reset (SW2-SA6) 5秒間長押しで有効
+ * TB2C2のバージョンおよびIPアドレス表示 (SW3-PC4)
+ * OPi Shutdown (SW1-PC7) 5秒間長押しで有効
 
 ## 必要なモジュール
 
