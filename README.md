@@ -3,7 +3,7 @@
 UECSインタフェースを使って排液量データを送出するデーモン
 
 
-Version 1.51  
+Version 1.53  
 horimoto@holly-linux.com
 
 Python3で動作する。
@@ -11,6 +11,14 @@ Python3で動作する。
 1.42はAmbient対応している。/etc/uecs/config.iniにAmbient設定を書き込むことでAmbientにもデータを送り出す。
 
 1.50から、GIS10に対応している。/etc/uecs/config.iniにgis設定を書き込むことでGIS10サーバにデータを送り出す。
+
+1.53から、ボタンを部分的に有効化した。
+左から
+
+ * PICのReset (!MCLR)
+ * OPi Reset (SW2-SA6) 5秒間長押しで有効
+ * TB2C2のバージョンおよびIPアドレス表示 (SW3-PC4)
+ * OPi Shutdown (SW1-PC7) 5秒間長押しで有効
 
 ## 必要なモジュール
 
@@ -112,19 +120,35 @@ config.iniを変更することで、room,region,order,priorityの設定を変�
 
      # cd work
      # apt update
-     # apt install i2c-tools python3-smbus python3-serial python3-netifaces python3-pip python3-setuptools ntp
+     # apt install i2c-tools python3-smbus python3-serial python3-netifaces python3-pip python3-setuptools ntp minicom emacs-nox
      # pip3 install --upgrade OPi.GPIO
      # git clone https://github.com/mhorimoto/tb2c2.git
      # cd tb2c2
+     # cd comet1
+     # cd lcd      # LCD関連プログラムのインストール
+     # ./install.sh
+       このあと、/usr/local/bin/lcd_i2c.pyのI2Cアドレスを必要に応じて編集する。
+     # cd ../rc
+     # ./install.sh
+     # cd ../shutdown
+     # ./install.sh
+     # systemctl enable bye.service
+     # cd ..
      # mkdir /etc/uecs
      # make install
+     # crontab -e
+       以下の2行を追記する。
+       MAILTO=""
+       0 0 * * * touch /tmp/tb2-zero
+
 
  詳細は、Makefileの中を見る。  
  /etc/uecs/config.iniを編集する。上書きに備えて直ぐにバックアップをconfig.ini-backなどとコピーしておく。
 
+
 ### minicomのインストール
 
-    # apt install minicom
+    # apt install minicom       # 上で実施済ならば不要
     # cp minirc.* /etc/minicom
 
  TB2は、ttyS1で192000bps。  
