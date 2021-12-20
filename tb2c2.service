@@ -1,6 +1,6 @@
 [Unit]
 Description = UECS TB2 Talker
-After = scanresponse.service
+After = rc-local.service
 
 [Service]
 ExecStart = /usr/local/bin/tb2c2d.py

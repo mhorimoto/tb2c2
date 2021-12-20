@@ -1,7 +1,7 @@
 #! /usr/bin/python3
 #coding: utf-8
 #
-Version="1.53B"
+Version="1.53C"
 #
 import os
 import subprocess
@@ -42,7 +42,18 @@ ec     = 0.0
 i_tp   = 0
 tp     = 0.0
 
-HOST = netifaces.ifaddresses('eth0')[netifaces.AF_INET][0]['addr']
+lcd.lcd_init()
+
+while True:
+    try:
+        HOST = netifaces.ifaddresses('eth0')[netifaces.AF_INET][0]['addr']
+        break
+    except KeyError:
+        lcd.lcd_string("NO eth0 Address",lcd.LCD_LINE_1)
+        lcd.lcd_string("tb2c2 WAITING..",lcd.LCD_LINE_2)
+        time.sleep(1)
+        continue
+
 ADDRESS = netifaces.ifaddresses('eth0')[netifaces.AF_INET][0]['broadcast']
 #HOST = netifaces.ifaddresses('tun0')[netifaces.AF_INET][0]['addr']
 #ADDRESS = netifaces.ifaddresses('tun0')[netifaces.AF_INET][0]['peer']
@@ -105,7 +116,6 @@ if 'gis' in config:
         gisflag = True
         MACADDR = getMACAddress()
         
-lcd.lcd_init()
 prevsec = 0
 ip = HOST
 

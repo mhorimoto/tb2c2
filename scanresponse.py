@@ -13,7 +13,14 @@ from socket import *
 
 XML_HEADER  = "<?xml version=\"1.0\"?>"
 UECS_HEADER = "<UECS ver=\"1.00-E10\">"
-HOST = netifaces.ifaddresses('eth0')[netifaces.AF_INET][0]['addr']
+while True:
+    try:
+        HOST = netifaces.ifaddresses('eth0')[netifaces.AF_INET][0]['addr']
+        break
+    except KeyError:
+        time.sleep(1)
+        continue
+    
 ADDRESS = netifaces.ifaddresses('eth0')[netifaces.AF_INET][0]['broadcast']
 PORT = 16529
 config = configparser.ConfigParser()
