@@ -1,6 +1,6 @@
 [Unit]
 Description = UECS Scanresponse
-After = rc-local.service
+After = tb2c2.service
 
 [Service]
 ExecStart = /usr/local/bin/scanresponse.py
