@@ -1,4 +1,5 @@
-PYLIBD=/usr/local/lib/python3.9/dist-packages
+PYLIBD=/usr/local/lib/python3.10/dist-packages
+#PYLIBD=/usr/local/lib/python3.9/dist-packages
 #PYLIBD=/usr/local/lib/python3.8/dist-packages
 #PYLIBD=/usr/local/lib/python3.6/dist-packages
 EXECP=/usr/local/bin/tb2c2d.py
