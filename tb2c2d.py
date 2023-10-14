@@ -1,7 +1,7 @@
 #! /usr/bin/python3
 #coding: utf-8
 #
-Version="1.53C"
+Version="1.54"
 #
 import os
 import subprocess
@@ -132,6 +132,11 @@ SW2D = "/sys/class/gpio/gpio6"
 SW3D = "/sys/class/gpio/gpio68"
 
 DOUT = open(GPIOEXPORT,"w")
+
+#
+# CPU Temperature
+#
+CPUT = "/sys/class/hwmon/hwmon0/device/temp"
 
 if os.path.isdir(SW1D):
     pass
@@ -334,6 +339,9 @@ while(True):
         D3.write("1")
         D3.flush()
         send_UECSdata("FLOW.mNB",f_ans,HOST)
+        with open(CPUT,"r") as CPUTFP:
+            cputemp = int(CPUTFP.read())
+        send_UECSdata("CPUTEMP.mNB",cputemp,HOST)
         if wd3present:
             send_UECSdata("VWC.mNB",vwc,HOST)
             send_UECSdata("EC.mNB",ec,HOST)
